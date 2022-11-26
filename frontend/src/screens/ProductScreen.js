@@ -1,24 +1,28 @@
-import React, { useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Form, Link, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Row, Col, Image, ListGroup, Card, Button } from 'react-bootstrap'
 import Rating from '../components/Rating'
-import { listProductDetails } from '../actions/productActions'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
-//import products from '../products'
-// import axios from 'axios'
+import { listProductDetails } from '../actions/productActions'
 
 const ProductScreen = () => {
+	const [qty, setQty] = useState(0)
+
+	//takes the id variable from url
 	const { id: proID } = useParams()
+
 	const dispatch = useDispatch()
-	//const [product, setProduct] = useState({})
 
 	useEffect(() => {
 		dispatch(listProductDetails(proID))
 	}, [dispatch, proID])
+
 	const productDetails = useSelector((state) => state.productDetails)
+
 	const { loading, error, product } = productDetails
+
 	return (
 		<>
 			<Link className='btn btn-light my-3' to='/'>
@@ -69,6 +73,29 @@ const ProductScreen = () => {
 										</Col>
 									</Row>
 								</ListGroup.Item>
+								{product.countInStock > 0 && (
+									<ListGroup.Item>
+										<Row>
+											<Col>Qty</Col>
+											<Col>
+												<Form.Select>
+													<select
+														value={qty}
+														onChange={(e) => setQty(e.target.value)}
+													>
+														{[...Array(product.countInStock).keys()].map(
+															(x) => (
+																<option key={x + 1} value={x + 1}>
+																	{x + 1}
+																</option>
+															)
+														)}
+													</select>
+												</Form.Select>
+											</Col>
+										</Row>
+									</ListGroup.Item>
+								)}
 								<ListGroup.Item>
 									<Button
 										className='btn-block w-100'

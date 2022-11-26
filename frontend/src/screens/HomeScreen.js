@@ -1,16 +1,20 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-//import products from '../products'
+import { toast } from 'react-toastify'
 import Product from '../components/Product'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import { Row, Col } from 'react-bootstrap'
 //import axios from 'axios'
-import { listProducts } from '../actions/productActions'
+import { listProducts ,reset} from '../features/products/productDataSlice'
 
 const HomeScreen = () => {
 	//const [products, setProducts] = useState([])
 	const dispatch = useDispatch()
+	
+	const productList = useSelector((state) => state.productList)
+	const { isLoading, isError, products,isSuccess,message } = productList
+	
 	useEffect(() => {
 		// const fetchProducts = async () => {
 		// 	//here this collects the whole response while adding {data} this directlyu accesses to the res.data method
@@ -20,19 +24,26 @@ const HomeScreen = () => {
 		// 	setProducts(data)
 		// }
 		// fetchProducts()
-		dispatch(listProducts())
+		if(isError){
+			toast.error(message)
+		}
+		if(products==[]){
+			dispatch(listProducts)
+		}
+		if(isSuccess){
+			console.log('productList is already loaded');
+		}
+		dispatch(reset)
 	}, [dispatch])
 
-	const productList = useSelector((state) => state.productList)
-	const { loading, error, products } = productList
 
 	return (
 		<>
 			<h1>Latest Products</h1>
-			{loading ? (
+			{isLoading ? (
 				<Loader />
-			) : error ? (
-				<Message variant='danger'>{error}</Message>
+			) : isError ? (
+				<Message variant='danger'>{message}</Message>
 			) : (
 				<Row>
 					{products.map((product) => (
@@ -41,7 +52,8 @@ const HomeScreen = () => {
 						</Col>
 					))}
 				</Row>
-			)}
+			)
+			}
 		</>
 	)
 }
