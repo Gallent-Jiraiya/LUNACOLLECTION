@@ -101,7 +101,7 @@ const ProductScreen = () => {
 									</ListGroup.Item>
 								)}
 								<ListGroup.Item>
-									{/* <Link to={`../..}> */}
+									{/* <Link to={`../cart/${proID}?qty=${qty}`}> */}
 									<Button
 										className='btn-block w-100'
 										type='button'

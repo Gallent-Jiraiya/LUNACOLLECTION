@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, current } from '@reduxjs/toolkit'
 import cartDataService from './cartDataService'
 
 const cart = JSON.parse(localStorage.getItem('cartItems'))
@@ -35,6 +35,12 @@ export const cartDataSlice = createSlice({
 			state.isSuccess = false
 			state.message = ''
 		},
+		removeFromCart: (state, action) => {
+			state.cartItems = state.cartItems.filter(
+				(x) => x.product !== action.payload
+			)
+			localStorage.setItem('cartItems', JSON.stringify(state.cartItems))
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -45,28 +51,30 @@ export const cartDataSlice = createSlice({
 				state.isLoading = false
 				state.isSuccess = true
 				const item = action.payload
-				const existItem = state.cartItems.find(
-					(x) => x.porduct === item.product
+				const existItem = state.cartItems.filter(
+					(x) => x.product === item.product
 				)
-				console.log(existItem)
-				if (state.cartItems.length === 0) {
-					state.cartItems = [item]
-				}
-				if (existItem) {
-					console.log('already exists')
-					state = {
-						...state,
-						cartItems: state.cartItems.map((x) =>
-							x.product === item.product ? item : x
-						),
-					}
-				} else {
-					state = {
-						...state,
-						cartItems: [...state.cartItems, item],
-					}
-				}
 
+				if (state.cartItems.length === 0) {
+					// console.log('cartitems.length=0')
+					state.cartItems = [item]
+				} else if (existItem.length > 0) {
+					// console.log('already exists')
+					const cart = state.cartItems.map((x) => {
+						if (x.product === item.product) {
+							// console.log(current(x))
+							// console.log(item)
+							return item
+						} else {
+							return x
+						}
+					})
+					// console.log(cart)
+					state.cartItems = cart
+				} else {
+					// console.log('new item')
+					state.cartItems = [...state.cartItems, item]
+				}
 				localStorage.setItem('cartItems', JSON.stringify(state.cartItems))
 			})
 			.addCase(addToCart.rejected, (state, action) => {
@@ -79,5 +87,5 @@ export const cartDataSlice = createSlice({
 	},
 })
 
-export const { reset } = cartDataSlice.actions
+export const { reset, removeFromCart } = cartDataSlice.actions
 export default cartDataSlice.reducer
