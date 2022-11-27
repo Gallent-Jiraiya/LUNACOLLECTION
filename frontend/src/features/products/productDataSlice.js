@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import productService from './productService'
 
-const products = JSON.parse(localStorage.getItem('products'))
+const product = JSON.parse(localStorage.getItem('product'))
 
 const initialState = {
-	products: products? products:[],
+	product: product ? product : { reviews: [] },
 	isError: false,
 	isSuccess: false,
 	isLoading: false,
@@ -12,11 +12,11 @@ const initialState = {
 }
 
 //getProducts
-export const listProducts = createAsyncThunk(
-	'products/get',
-	async (products, thunkAPI) => {
+export const listProduct = createAsyncThunk(
+	'products/get/:id',
+	async (id, thunkAPI) => {
 		try {
-			return await productService.getProducts()
+			return await productService.listProduct(id)
 		} catch (error) {
 			const message =
 				(error.response &&
@@ -29,8 +29,8 @@ export const listProducts = createAsyncThunk(
 	}
 )
 
-export const productListSlice = createSlice({
-	name: 'productList',
+export const productDataSlice = createSlice({
+	name: 'productDetails',
 	initialState,
 	reducers: {
 		reset: (state) => {
@@ -41,24 +41,24 @@ export const productListSlice = createSlice({
 		},
 	},
 	extraReducers: (builder) => {
-    builder
-    .addCase(listProducts.pending,(state)=>{
-      state.isLoading=true
-    })
-    .addCase(listProducts.fulfilled,(state,action)=>{
-      state.loading=false
-      state.isSuccess=true
-      state.products=action.payload
-    })
-    .addCase(listProducts.rejected,(state,action)=>{
-      state.isLoading=false
-      state.isSuccess=false
-      state.isError=true
-      state.message=action.payload
-      state.products=[]
-    })
-  },
+		builder
+			.addCase(listProduct.pending, (state) => {
+				state.isLoading = true
+			})
+			.addCase(listProduct.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = true
+				state.product = action.payload
+			})
+			.addCase(listProduct.rejected, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = false
+				state.isError = true
+				state.message = action.payload
+				//state.product = []
+			})
+	},
 })
 
-export const { reset } = productListSlice.actions
-export default productListSlice.reducer
+export const { reset } = productDataSlice.actions
+export default productDataSlice.reducer

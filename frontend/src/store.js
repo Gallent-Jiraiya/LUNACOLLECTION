@@ -1,17 +1,19 @@
-import {configureStore } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
 
-import {
-	productDetailsReducer,
-} from './reducers/productReducers'
-import { productListReducer } from './features/products/productDataSlice'
+import productListDataReducer from './features/products/productListDataSlice'
+import productDataReducer from './features/products/productDataSlice'
+import cartDataReducer from './features/cart/cartDataSlice'
 
-const store = configureStore(
-{
-	reducer:{
-		productList: productListReducer,
-		productDetails: productDetailsReducer,
-	}
-}
-)
+const store = configureStore({
+	reducer: {
+		productList: productListDataReducer,
+		productDetails: productDataReducer,
+		cart: cartDataReducer,
+	},
+	middleware: (getDefaultMiddleware) =>
+		getDefaultMiddleware({
+			serializableCheck: true,
+		}),
+})
 
 export default store
