@@ -14,8 +14,8 @@ const initialState = {
 //addProducts
 export const addToCart = createAsyncThunk('cart/add', async (ob, thunkAPI) => {
 	try {
-		console.log(ob)
-		return await cartDataService.checkCart(ob.id, ob.qty)
+		//console.log(ob)
+		const object = await cartDataService.checkCart(ob.id, ob.qty)
 	} catch (error) {
 		const message =
 			(error.response && error.response.data && error.response.data.message) ||
@@ -50,16 +50,18 @@ export const cartDataSlice = createSlice({
 			.addCase(addToCart.fulfilled, (state, action) => {
 				state.isLoading = false
 				state.isSuccess = true
+
 				const item = action.payload
-				const existItem = state.cartItems.filter(
+
+				const existItem = state.cartItems.find(
 					(x) => x.product === item.product
 				)
 
 				if (state.cartItems.length === 0) {
 					// console.log('cartitems.length=0')
 					state.cartItems = [item]
-				} else if (existItem.length > 0) {
-					// console.log('already exists')
+				} else if (existItem) {
+					console.log('already exists')
 					const cart = state.cartItems.map((x) => {
 						if (x.product === item.product) {
 							// console.log(current(x))
@@ -72,6 +74,7 @@ export const cartDataSlice = createSlice({
 					// console.log(cart)
 					state.cartItems = cart
 				} else {
+					//if item is a new item it gets pushed to state
 					// console.log('new item')
 					state.cartItems = [...state.cartItems, item]
 				}
@@ -82,7 +85,6 @@ export const cartDataSlice = createSlice({
 				state.isSuccess = false
 				state.isError = true
 				state.message = action.payload
-				//state.cart=[]
 			})
 	},
 })

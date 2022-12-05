@@ -5,6 +5,7 @@ import { notFound, errorHandler } from './middleware/errorMiddleware.js'
 import connectDB from './config/db.js'
 
 import productRoutes from './routes/productRoutes.js'
+import userRoutes from './routes/userRoutes.js'
 
 //this connects env file with the config file
 dotenv.config()
@@ -12,12 +13,17 @@ connectDB()
 
 const app = express()
 
+app.use(express.json())
+
 app.get('/', (req, res) => {
 	res.send('API is running......')
 })
 
 //this redirects any url with /api/products to route in productRoutes
 app.use('/api/products', productRoutes)
+
+//this redirects any url with /api/users to route in userRoutes
+app.use('/api/users', userRoutes)
 
 app.use(notFound)
 

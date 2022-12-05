@@ -10,9 +10,20 @@ const Header = () => {
 					<LinkContainer to='/'>
 						<Navbar.Brand>Luna Collection</Navbar.Brand>
 					</LinkContainer>
-					<Navbar.Toggle aria-controls='basic-navbar-nav' />
+					<Navbar.Toggle aria-controls='basic-navbar-nav' className='ms-auto' />
 					<Navbar.Collapse id='basic-navbar-nav'>
 						<Nav className='ms-auto'>
+							<LinkContainer to='/'>
+								<Nav.Link>
+									<i className='fas fa-house'></i>Home
+								</Nav.Link>
+							</LinkContainer>
+							<LinkContainer to='/'>
+								<Nav.Link>
+									<i className='fas fa-shop'></i>Shop
+								</Nav.Link>
+							</LinkContainer>
+
 							<LinkContainer to='/cart'>
 								<Nav.Link>
 									<i className='fas fa-shopping-cart'></i>Cart
