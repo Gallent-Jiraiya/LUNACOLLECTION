@@ -2,7 +2,7 @@ import asyncHandler from 'express-async-handler'
 import User from '../models/userModel.js'
 import generateToken from '../utils/generateToken.js'
 
-//@desc Auth user & get token
+//@desc Authenticate user & get token in login
 //@route POST/api/users/login
 //@access Public
 const authUser = asyncHandler(async (req, res) => {
@@ -23,7 +23,7 @@ const authUser = asyncHandler(async (req, res) => {
 	}
 })
 
-//@desc Register a new user
+//@desc Register a new user and provide a token
 //@route POST/api/users
 //@access Public
 const registerUser = asyncHandler(async (req, res) => {
@@ -68,4 +68,45 @@ const getUserProfile = asyncHandler(async (req, res) => {
 	}
 })
 
-export { authUser, registerUser, getUserProfile }
+//@desc Update user profile and provide updated profile
+//@route PUT/api/users/profile
+//@access Private
+const updateUserProfile = asyncHandler(async (req, res) => {
+	const { email } = req.body
+	console.log({ email })
+	const user = await User.findById(req.user._id)
+	const modifiedEmailUser = await User.findOne({ email })
+	console.log(modifiedEmailUser)
+	console.log('modifiedEmailUser')
+
+	console.log(JSON.stringify(req.user._id))
+	if (
+		modifiedEmailUser &&
+		JSON.stringify(req.user._id) !== JSON.stringify(modifiedEmailUser._id)
+	) {
+		res.status(400)
+		throw new Error('Another user with this Email already exists')
+	} else {
+		if (user) {
+			user.name = req.body.name || user.name
+			user.email = req.body.email || user.email
+			if (req.body.password) {
+				user.password = req.body.password
+			}
+			const updatedUser = await user.save()
+			//console.log(updatedUser)
+			res.json({
+				_id: updatedUser._id,
+				name: updatedUser.name,
+				email: updatedUser.email,
+				isAdmin: updatedUser.isAdmin,
+				token: generateToken(updatedUser._id),
+			})
+		} else {
+			res.status(401)
+			throw new Error('User not found')
+		}
+	}
+})
+
+export { authUser, registerUser, getUserProfile, updateUserProfile }

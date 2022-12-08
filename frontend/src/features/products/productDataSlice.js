@@ -44,9 +44,12 @@ export const productDataSlice = createSlice({
 		builder
 			.addCase(listProduct.pending, (state) => {
 				state.isLoading = true
+				state.isSuccess = false
 			})
 			.addCase(listProduct.fulfilled, (state, action) => {
 				state.isLoading = false
+				state.isError = false
+				state.message = ''
 				state.isSuccess = true
 				state.product = action.payload
 			})
