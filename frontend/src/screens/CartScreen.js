@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import Message from '../components/Message'
-import { addToCart, removeFromCart } from '../features/cart/cartDataSlice'
+import { removeFromCart } from '../features/cart/cartDataSlice'
 import {
 	Button,
 	Card,
@@ -13,6 +13,7 @@ import {
 	ListGroupItem,
 	Row,
 } from 'react-bootstrap'
+import { addToCart } from '../features/cart/cartActions'
 function CartScreen() {
 	const { id: proID } = useParams()
 	const [searchParams] = useSearchParams()

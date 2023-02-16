@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createOrder } from './orderActions.js'
 import orderDataService from './orderDataService.js'
 
 const orderList = JSON.parse(localStorage.getItem('orders'))
@@ -12,50 +13,6 @@ const initialState = {
 	isLoading: false,
 	message: '',
 }
-
-//addProducts
-export const createOrder = createAsyncThunk(
-	'order/add',
-	async (
-		{
-			orderItems,
-			shippingAddress,
-			paymentMethod,
-			shippingPrice,
-			totalPrice,
-			token,
-		},
-		thunkAPI
-	) => {
-		try {
-			const config = {
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`,
-				},
-			}
-			console.log('createOrdergetCalled')
-			return await orderDataService.makeOrder(
-				{
-					orderItems,
-					shippingAddress,
-					paymentMethod,
-					shippingPrice,
-					totalPrice,
-				},
-				config
-			)
-		} catch (error) {
-			const message =
-				(error.response &&
-					error.response.data &&
-					error.response.data.message) ||
-				error.message ||
-				error.toString()
-			return thunkAPI.rejectWithValue(message)
-		}
-	}
-)
 
 export const orderDataSlice = createSlice({
 	name: 'orders',

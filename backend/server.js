@@ -7,6 +7,7 @@ import connectDB from './config/db.js'
 import productRoutes from './routes/productRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
+import cartRoutes from './routes/cartRoutes.js'
 
 //this connects env file with the config file
 dotenv.config()
@@ -26,6 +27,8 @@ app.use('/api/products', productRoutes)
 //this redirects any url with /api/users to route in userRoutes
 app.use('/api/users', userRoutes)
 app.use('/api/orders', orderRoutes)
+app.use('/api/orders', orderRoutes)
+app.use('/api/cart', cartRoutes)
 
 app.use(notFound)
 

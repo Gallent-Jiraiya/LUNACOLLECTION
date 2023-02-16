@@ -21,9 +21,10 @@ import {
 	setPrices,
 } from '../features/cart/cartDataSlice'
 
-import { reset, createOrder } from '../features/order/orderDataSlice'
+import { reset } from '../features/order/orderDataSlice'
 
 import CheckoutSteps from '../components/CheckoutSteps'
+import { createOrder } from '../features/order/orderActions'
 export const PlaceOrderScreen = () => {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()

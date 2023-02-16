@@ -1,22 +1,32 @@
 import axios from 'axios'
+import { getCookie } from '../../middleware/getCookie'
 
-const getOrderById = async (id, qty) => {
-	const { data } = await axios.get(`/api/orders/${id}`)
-	return {
-		product: data._id,
-		name: data.name,
-		image: data.image,
-		price: data.price,
-		countInStock: data.countInStock,
-		qty: parseInt(qty),
+const getOrderById = async (id) => {
+	const token = decodeURI(getCookie('token'))
+	const config = {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`,
+		},
 	}
+	const { data } = await axios.get(`/api/orders/${id}`, config)
+	return data
 }
 
-const makeOrder = async (
-	{ orderItems, shippingAddress, paymentMethod, shippingPrice, totalPrice },
-	config
-) => {
-	console.log('makeOrdergetCaleed')
+const makeOrder = async ({
+	orderItems,
+	shippingAddress,
+	paymentMethod,
+	shippingPrice,
+	totalPrice,
+}) => {
+	const token = decodeURI(getCookie('token'))
+	const config = {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`,
+		},
+	}
 	const { data } = await axios.post(
 		`/api/orders`,
 		{
