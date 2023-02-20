@@ -5,14 +5,7 @@ import orderDataService from './orderDataService'
 export const createOrder = createAsyncThunk(
 	'order/add',
 	async (
-		{
-			orderItems,
-			shippingAddress,
-			paymentMethod,
-			shippingPrice,
-			totalPrice,
-			token,
-		},
+		{ orderItems, shippingAddress, paymentMethod, shippingPrice, totalPrice },
 		thunkAPI
 	) => {
 		try {
@@ -38,7 +31,7 @@ export const createOrder = createAsyncThunk(
 
 //get Order by id
 export const getOrderById = createAsyncThunk(
-	'order/add',
+	'order/get',
 	async (id, thunkAPI) => {
 		try {
 			return await orderDataService.getOrderById(id)

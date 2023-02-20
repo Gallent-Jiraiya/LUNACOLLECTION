@@ -16,10 +16,6 @@ const store = configureStore({
 		profileDetails: profileDataReducer,
 		orders: orderDataReducer,
 	},
-	middleware: (getDefaultMiddleware) =>
-		getDefaultMiddleware({
-			serializableCheck: true,
-		}),
 })
 
 export default store

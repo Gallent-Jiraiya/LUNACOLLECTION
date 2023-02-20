@@ -1,6 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 import { addToCart } from './cartActions'
-import cartDataService from './cartDataService'
 
 const cart = JSON.parse(localStorage.getItem('cartItems'))
 const shippingAddress = JSON.parse(localStorage.getItem('shippingAddress'))

@@ -21,7 +21,7 @@ import {
 	setPrices,
 } from '../features/cart/cartDataSlice'
 
-import { reset } from '../features/order/orderDataSlice'
+import { reset, resetOrderStatus } from '../features/order/orderDataSlice'
 
 import CheckoutSteps from '../components/CheckoutSteps'
 import { createOrder } from '../features/order/orderActions'
@@ -31,8 +31,9 @@ export const PlaceOrderScreen = () => {
 
 	const { token } = useSelector((state) => state.userLogInDetails.userInfo)
 
-	const { orderList, isError, isSuccess, isLoading, message, lastOrderID } =
-		useSelector((state) => state.orders)
+	const { isError, isSuccess, isLoading, message, order, action } = useSelector(
+		(state) => state.orders
+	)
 
 	const cart = useSelector((state) => state.cart)
 	const { cartItems, shippingAddress, paymentMethod } = cart
@@ -46,15 +47,15 @@ export const PlaceOrderScreen = () => {
 	const totalPrice = itemsPrice + shippingPrice
 
 	useEffect(() => {
-		if (isSuccess) {
-			navigate(`/orders/${lastOrderID}`)
-			dispatch(reset())
+		if (action === 'createOrder' && isSuccess) {
+			navigate(`/orders/${order._id}`)
+			dispatch(resetOrderStatus())
 		}
-		if (isError) {
+		if (action === 'createOrder' && isError) {
 			toast.error(message)
-			dispatch(reset())
+			dispatch(resetOrderStatus())
 		}
-	}, [isSuccess, isError, message])
+	}, [isSuccess, isError, message, action, navigate, order._id, dispatch])
 
 	const placeOrderHandler = (e) => {
 		e.preventDefault()

@@ -1,12 +1,10 @@
 import asyncHandler from 'express-async-handler'
 import Order from '../models/orderModel.js'
-import User from '../models/userModel.js'
 //@desc create new order
 //@route Post/api/orders
-//@access public
+//@access private
 const addOrderItems = asyncHandler(async (req, res) => {
 	try {
-		console.log('addorderItemsControllerreached')
 		console.log(req.user._id)
 		const {
 			orderItems,
@@ -19,7 +17,6 @@ const addOrderItems = asyncHandler(async (req, res) => {
 		if (orderItems && orderItems.length === 0) {
 			res.status(400)
 			throw new Error('No order Items')
-			return
 		} else {
 			const order = new Order({
 				user: req.user._id,
@@ -38,4 +35,21 @@ const addOrderItems = asyncHandler(async (req, res) => {
 	}
 })
 
-export { addOrderItems }
+//@desc get order by ID
+//@route Post/api/orders/:id
+//@access private
+const getOrderByID = asyncHandler(async (req, res) => {
+	const order = await Order.findById(req.params.id).populate(
+		'user',
+		'name email'
+	)
+	console.log(order)
+	if (order) {
+		res.json(order)
+	} else {
+		res.status(404)
+		throw new Error('Order not found')
+	}
+})
+
+export { addOrderItems, getOrderByID }
