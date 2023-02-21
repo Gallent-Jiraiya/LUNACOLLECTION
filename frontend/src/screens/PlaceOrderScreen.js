@@ -1,27 +1,21 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-
 import {
 	Button,
 	Col,
 	Row,
 	ListGroup,
 	Image,
-	Cart,
 	ListGroupItem,
 	Card,
 } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
-import {
-	addShippingAddress,
-	savePaymentMethod,
-	setPrices,
-} from '../features/cart/cartDataSlice'
+import { setPrices } from '../features/cart/cartDataSlice'
 
-import { reset, resetOrderStatus } from '../features/order/orderDataSlice'
+import { resetOrderStatus } from '../features/order/orderDataSlice'
 
 import CheckoutSteps from '../components/CheckoutSteps'
 import { createOrder } from '../features/order/orderActions'
@@ -31,7 +25,7 @@ export const PlaceOrderScreen = () => {
 
 	const { token } = useSelector((state) => state.userLogInDetails.userInfo)
 
-	const { isError, isSuccess, isLoading, message, order, action } = useSelector(
+	const { isError, isSuccess, message, order, action } = useSelector(
 		(state) => state.orders
 	)
 
@@ -55,11 +49,12 @@ export const PlaceOrderScreen = () => {
 			toast.error(message)
 			dispatch(resetOrderStatus())
 		}
-	}, [isSuccess, isError, message, action, navigate, order._id, dispatch])
+	}, [isSuccess, isError, message, action, navigate, order, dispatch])
 
 	const placeOrderHandler = (e) => {
 		e.preventDefault()
 		dispatch(setPrices({ totalPrice, shippingPrice, itemsPrice }))
+		console.log(cartItems)
 		dispatch(
 			createOrder({
 				orderItems: cartItems,

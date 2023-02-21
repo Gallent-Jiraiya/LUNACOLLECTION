@@ -9,14 +9,15 @@ export const createOrder = createAsyncThunk(
 		thunkAPI
 	) => {
 		try {
-			console.log('createOrdergetCalled')
-			return await orderDataService.makeOrder({
+			// console.log('createOrdergetCalled')
+			const response = await orderDataService.makeOrder({
 				orderItems,
 				shippingAddress,
 				paymentMethod,
 				shippingPrice,
 				totalPrice,
 			})
+			return response
 		} catch (error) {
 			const message =
 				(error.response &&

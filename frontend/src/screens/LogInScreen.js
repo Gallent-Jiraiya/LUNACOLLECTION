@@ -28,7 +28,7 @@ function LogInScreen() {
 		if (isError) {
 			toast.error(message)
 		}
-	}, [userInfo, navigate, isError, message])
+	}, [userInfo, navigate, isError, message, redirect])
 
 	const submitHandler = (e) => {
 		e.preventDefault()

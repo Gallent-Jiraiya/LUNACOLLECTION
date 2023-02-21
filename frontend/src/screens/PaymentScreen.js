@@ -22,7 +22,7 @@ const PaymentScreen = () => {
 		if (!shippingAddress) {
 			navigate('/shipping')
 		}
-	}, [])
+	}, [navigate, shippingAddress])
 	const [paymentMethod, setPaymentMethod] = useState('PayPal')
 
 	const submitHandler = (e) => {

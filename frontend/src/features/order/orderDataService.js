@@ -40,7 +40,7 @@ const makeOrder = async ({
 	)
 
 	return {
-		order: data._id,
+		_id: data._id,
 		user: data.user,
 		orderItems: data.orderItems,
 		shippingAddress: data.shippingAddress,
