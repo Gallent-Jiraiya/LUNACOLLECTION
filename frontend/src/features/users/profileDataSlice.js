@@ -1,91 +1,34 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import userService from './userService'
+import { createSlice } from '@reduxjs/toolkit'
+import { getProfile, updateProfile } from './UserActions'
 
 const initialState = {
 	profileInfo: null,
 	isError: false,
 	isSuccess: false,
-	updateIsSuccess: false,
 	isLoading: false,
 	message: '',
+	action: '',
 }
 //action functions
-export const getProfile = createAsyncThunk(
-	'users/getProfile',
-	async ({ token }, thunkAPI) => {
-		try {
-			const config = {
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`,
-				},
-			}
-			//console.log(token)
-			const data = await userService.getProfile(config)
-			//localStorage.setItem('userInfo', JSON.stringify(data))
-			//console.log(data)
-			return data
-			//return await productService.listProduct(id)
-		} catch (error) {
-			const message =
-				(error.response &&
-					error.response.data &&
-					error.response.data.message) ||
-				error.message ||
-				error.toString()
-			return thunkAPI.rejectWithValue(message)
-		}
-	}
-)
-export const updateProfile = createAsyncThunk(
-	'users/updateProfile',
-	async ({ name, email, password, token }, thunkAPI) => {
-		try {
-			//console.log(token)
-			const config = {
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`,
-				},
-			}
-			const data = await userService.updateProfile(
-				{ name, email, password },
-				config
-			)
-			localStorage.setItem('userInfo', JSON.stringify(data))
-			//console.log(data)
-			return data
-			//return await productService.listProduct(id)
-		} catch (error) {
-			const message =
-				(error.response &&
-					error.response.data &&
-					error.response.data.message) ||
-				error.message ||
-				error.toString()
-			return thunkAPI.rejectWithValue(message)
-		}
-	}
-)
 
 export const profileDataSlice = createSlice({
 	name: 'profileDetails',
 	initialState,
 	reducers: {
-		reset: (state) => {
+		resetProfileStatus: (state) => {
 			state.isLoading = false
 			state.isError = false
 			state.isSuccess = false
-			state.updateIsSuccess = false
 			state.message = ''
+			state.action = ''
 		},
 		resetWithProfile: (state) => {
 			state.isLoading = false
 			state.profileInfo = null
 			state.isError = false
 			state.isSuccess = false
-			state.updateIsSuccess = false
 			state.message = ''
+			state.action = ''
 		},
 	},
 	extraReducers: (builder) => {
@@ -96,6 +39,7 @@ export const profileDataSlice = createSlice({
 				state.isError = false
 				state.isSuccess = false
 				state.message = ''
+				state.action = 'getProfile'
 			})
 			.addCase(getProfile.fulfilled, (state, action) => {
 				state.isLoading = false
@@ -103,6 +47,7 @@ export const profileDataSlice = createSlice({
 				state.isSuccess = true
 				state.profileInfo = action.payload
 				state.message = ''
+				state.action = 'getProfile'
 			})
 			.addCase(getProfile.rejected, (state, action) => {
 				state.isLoading = false
@@ -110,12 +55,14 @@ export const profileDataSlice = createSlice({
 				state.profileInfo = null
 				state.isError = true
 				state.message = action.payload
+				state.action = 'getProfile'
 			})
 			.addCase(updateProfile.pending, (state) => {
 				state.isLoading = true
 				state.isError = false
 				state.isSuccess = false
 				state.message = ''
+				state.action = 'updateProfile'
 			})
 			.addCase(updateProfile.fulfilled, (state, action) => {
 				state.isLoading = false
@@ -123,16 +70,17 @@ export const profileDataSlice = createSlice({
 				state.updateIsSuccess = true
 				state.profileInfo = action.payload
 				state.message = ''
+				state.action = 'updateProfile'
 			})
 			.addCase(updateProfile.rejected, (state, action) => {
 				state.isLoading = false
 				state.isSuccess = false
-				state.updateIsSuccess = false
 				state.isError = true
 				state.message = action.payload
+				state.action = 'updateProfile'
 			})
 	},
 })
 
-export const { reset, resetWithProfile } = profileDataSlice.actions
+export const { resetProfileStatus, resetWithProfile } = profileDataSlice.actions
 export default profileDataSlice.reducer

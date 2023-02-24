@@ -2,16 +2,26 @@ import React from 'react'
 import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 import { useSelector, useDispatch } from 'react-redux'
-import { logout } from '../features/users/userLogInDataSlice'
+import { logout } from '../features/users/logInDataSlice'
 import { resetWithProfile } from '../features/users/profileDataSlice'
+import { useNavigate } from 'react-router-dom'
+import { resetUsersList } from '../features/users/userListDataSlice'
 
 const Header = () => {
 	const dispatch = useDispatch()
-	const userLogInDetails = useSelector((state) => state.userLogInDetails)
+	const navigate = useNavigate()
+	const userLogInDetails = useSelector((state) => state.logInDetails)
 	const { userInfo } = userLogInDetails
 	const logoutHandler = () => {
 		dispatch(logout())
 		dispatch(resetWithProfile())
+		dispatch(resetUsersList())
+		document.cookie =
+			'isAdmin= ; expires = Thu, 01 Jan 1970 00:00:00 GMT path=/;'
+		document.cookie = 'token= ; expires = Thu, 01 Jan 1970 00:00:00 GMT path=/;'
+		document.cookie = 'name= ; expires = Thu, 01 Jan 1970 00:00:00 GMT path=/;'
+
+		navigate('/')
 	}
 	return (
 		<header>
@@ -54,6 +64,19 @@ const Header = () => {
 										<i className='fas fa-user'></i>Sign In
 									</Nav.Link>
 								</LinkContainer>
+							)}
+							{userInfo && userInfo.isAdmin && (
+								<NavDropdown title={'Admin'} id='adminmenu'>
+									<LinkContainer to='/admin/userlist'>
+										<NavDropdown.Item>Users</NavDropdown.Item>
+									</LinkContainer>
+									<LinkContainer to='/admin/productlist'>
+										<NavDropdown.Item>Products</NavDropdown.Item>
+									</LinkContainer>
+									<LinkContainer to='/admin/orderlist'>
+										<NavDropdown.Item>Orders</NavDropdown.Item>
+									</LinkContainer>
+								</NavDropdown>
 							)}
 						</Nav>
 					</Navbar.Collapse>

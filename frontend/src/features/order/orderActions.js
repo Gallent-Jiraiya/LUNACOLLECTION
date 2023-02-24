@@ -47,3 +47,37 @@ export const getOrderById = createAsyncThunk(
 		}
 	}
 )
+//pay order by id
+export const payOrder = createAsyncThunk(
+	'order/pay',
+	async (orderID, paymentResult, thunkAPI) => {
+		try {
+			return await orderDataService.payOrder(orderID, paymentResult)
+		} catch (error) {
+			const message =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString()
+			return thunkAPI.rejectWithValue(message)
+		}
+	}
+)
+//get Logged in users all orders
+export const getMyOrders = createAsyncThunk(
+	'order/myOrders',
+	async (_, thunkAPI) => {
+		try {
+			return await orderDataService.getMyOrders()
+		} catch (error) {
+			const message =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString()
+			return thunkAPI.rejectWithValue(message)
+		}
+	}
+)

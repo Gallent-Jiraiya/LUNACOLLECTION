@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../components/Loader'
-import { registerUser, reset } from '../features/users/userLogInDataSlice'
+import { resetLogIn } from '../features/users/logInDataSlice'
 import FormContainer from '../components/FormContainer'
 import { Form, Button, Col, Row } from 'react-bootstrap'
 import { toast } from 'react-toastify'
+import { registerUser } from '../features/users/UserActions'
 
 function RegisterScreen() {
 	const [email, setEmail] = useState('')
@@ -21,16 +22,16 @@ function RegisterScreen() {
 	useEffect(() => {
 		if (isSuccess || userInfo) {
 			navigate('/')
-			dispatch(reset())
+			dispatch(resetLogIn())
 		}
 		if (isError) {
 			toast.error(message)
-			dispatch(reset())
+			dispatch(resetLogIn())
 		}
 		if (passwordMessage) {
 			toast.error(passwordMessage)
 			setPasswordMessage('')
-			dispatch(reset())
+			dispatch(resetLogIn())
 		}
 	}, [
 		userInfo,
@@ -38,7 +39,7 @@ function RegisterScreen() {
 		isSuccess,
 		message,
 		isError,
-		reset,
+		resetLogIn,
 		dispatch,
 		passwordMessage,
 	])

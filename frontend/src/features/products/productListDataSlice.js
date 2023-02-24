@@ -1,10 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import productService from './productService'
 
-const products = JSON.parse(localStorage.getItem('products'))
-
 const initialState = {
-	products: products? products:[],
+	products: [],
 	isError: false,
 	isSuccess: false,
 	isLoading: false,
@@ -33,7 +31,8 @@ export const productListDataSlice = createSlice({
 	name: 'productList',
 	initialState,
 	reducers: {
-		reset: (state) => {
+		resetProductList: (state) => {
+			state.products = []
 			state.isLoading = false
 			state.isError = false
 			state.isSuccess = false
@@ -41,24 +40,24 @@ export const productListDataSlice = createSlice({
 		},
 	},
 	extraReducers: (builder) => {
-    builder
-    .addCase(listProducts.pending,(state)=>{
-      state.isLoading=true
-    })
-    .addCase(listProducts.fulfilled,(state,action)=>{
-      state.isLoading=false
-      state.isSuccess=true
-      state.products=action.payload
-    })
-    .addCase(listProducts.rejected,(state,action)=>{
-      state.isLoading=false
-      state.isSuccess=false
-      state.isError=true
-      state.message=action.payload
-      //state.products=[]
-    })
-  },
+		builder
+			.addCase(listProducts.pending, (state) => {
+				state.isLoading = true
+			})
+			.addCase(listProducts.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = true
+				state.products = action.payload
+			})
+			.addCase(listProducts.rejected, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = false
+				state.isError = true
+				state.message = action.payload
+				//state.products=[]
+			})
+	},
 })
 
-export const { reset } = productListDataSlice.actions
+export const { resetProductList } = productListDataSlice.actions
 export default productListDataSlice.reducer

@@ -2,79 +2,71 @@ import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../components/Loader'
-import {
-	getProfile,
-	updateProfile,
-	reset,
-} from '../features/users/profileDataSlice'
-import { Form, Button, Col, Row } from 'react-bootstrap'
+import { Form, Button, Col, Row, Table } from 'react-bootstrap'
 import { toast } from 'react-toastify'
 import {
 	setUserInfoName,
 	setUserInfoMail,
-} from '../features/users/userLogInDataSlice'
+} from '../features/users/logInDataSlice'
+import { resetProfileStatus } from '../features/users/profileDataSlice'
+import { getProfile, updateProfile } from '../features/users/UserActions'
+import { getMyOrders } from '../features/order/orderActions'
+import { resetOrderStatus } from '../features/order/orderDataSlice'
+import Message from '../components/Message'
 
 function ProfileScreen() {
 	const [email, setEmail] = useState('')
 	const [name, setName] = useState('')
 	const [password, setPassword] = useState('')
 	const [confirmPassword, setConfirmPassword] = useState('')
-	const [passwordMessage, setPasswordMessage] = useState('')
+	const [ordersList, setOrdersList] = useState([])
 
 	const navigate = useNavigate()
 	const dispatch = useDispatch()
 
-	const { userInfo } = useSelector((state) => state.userLogInDetails)
-	const { profileInfo, isError, isLoading, message, updateIsSuccess } =
-		useSelector((state) => state.profileDetails)
+	const { userInfo } = useSelector((state) => state.logInDetails)
+	const ordersReduxState = useSelector((state) => state.orders)
+	const profileDetails = useSelector((state) => state.profileDetails)
 
 	useEffect(() => {
-		if (isError) {
-			toast.error(message)
-			dispatch(reset())
-		}
-		if (passwordMessage) {
-			toast.error(passwordMessage)
-			setPasswordMessage('')
-			dispatch(reset())
-		}
-		if (updateIsSuccess) {
-			toast.error('succesfully updated')
-			dispatch(setUserInfoName(name))
-			dispatch(setUserInfoMail(email))
-			dispatch(reset())
-		}
-
 		if (!userInfo) {
 			navigate('/login')
-		} else {
-			if (profileInfo === null || profileInfo.email !== userInfo.email) {
-				//console.log(userInfo['token'])
-				dispatch(getProfile({ token: userInfo['token'] }))
-			} else {
-				setName(profileInfo.name)
-				setEmail(profileInfo.email)
-			}
 		}
-	}, [
-		userInfo,
-		dispatch,
-		navigate,
-		profileInfo,
-		updateIsSuccess,
-		isError,
-		passwordMessage,
-	])
+		dispatch(getMyOrders())
+		dispatch(getProfile())
+	}, [dispatch, navigate, userInfo])
+
+	if (profileDetails.profileInfo && email === '') {
+		setEmail(profileDetails.profileInfo.email)
+		setName(profileDetails.profileInfo.name)
+	}
+	if (
+		ordersReduxState.orderList &&
+		ordersReduxState.orderList.length > 0 &&
+		ordersList.length === 0
+	) {
+		setOrdersList(ordersReduxState.orderList)
+		dispatch(resetOrderStatus())
+	}
+
+	if (profileDetails.action === 'updateProfile' && profileDetails.isSuccess) {
+		toast.success('succesfully updated')
+		dispatch(setUserInfoName(name))
+		dispatch(setUserInfoMail(email))
+		dispatch(resetProfileStatus())
+	}
+	if (profileDetails.action === 'getProfile' && profileDetails.isSuccess) {
+		setName(profileDetails.profileInfo.name)
+		setEmail(profileDetails.profileInfo.email)
+		dispatch(resetProfileStatus())
+	}
 
 	const submitHandler = (e) => {
 		e.preventDefault()
 		if (password !== confirmPassword) {
-			setPasswordMessage('Passwords do not match')
+			toast.error('Passwords do not match')
 		} else {
-			setPasswordMessage('')
-			dispatch(
-				updateProfile({ name, email, password, token: userInfo['token'] })
-			)
+			dispatch(updateProfile({ name, email, password }))
 		}
 	}
 
@@ -82,7 +74,10 @@ function ProfileScreen() {
 		<Row>
 			<Col md={3}>
 				<h2>User Profile</h2>
-				{isLoading && <Loader />}
+				{profileDetails.isLoading && <Loader />}
+				{profileDetails.isError && (
+					<Message variant={'danger'}>{profileDetails.message}</Message>
+				)}
 				<Form onSubmit={submitHandler}>
 					<Form.Group controlId='name'>
 						<Form.Label>User Name</Form.Label>
@@ -128,6 +123,64 @@ function ProfileScreen() {
 			</Col>
 			<Col md={9}>
 				<h2>My Orders</h2>
+				{ordersReduxState.isLoading &&
+					ordersReduxState.action === 'getMyOrders' && <Loader />}
+				{ordersReduxState.isError &&
+					ordersReduxState.action === 'getMyOrders' && (
+						<Message variant={'danger'}>{ordersReduxState.message}</Message>
+					)}
+				<Table striped bordered hover responsive className='table-sm'>
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>DATE</th>
+							<th>TOTAL</th>
+							<th>PAID</th>
+							<th>DELIVERED</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						{ordersList.length === 0 && (
+							<tr key={0}>
+								<td colSpan={6} className='text-center'>
+									O orders
+								</td>
+							</tr>
+						)}
+						{ordersList.length > 0 &&
+							ordersList.map((order) => (
+								<tr key={order._id}>
+									<td>{order._id}</td>
+									<td>{order.createdAt.substring(0, 10)}</td>
+									<td>{order.totalPrice}</td>
+									<td>
+										{order.isPaid ? (
+											order.paidAt.substring(0, 10)
+										) : (
+											<i className='fas fa-times' style={{ color: 'red' }}></i>
+										)}
+									</td>
+									<td>
+										{order.isDelivered ? (
+											order.deliveredAt.substring(0, 10)
+										) : (
+											<i className='fas fa-times' style={{ color: 'red' }}></i>
+										)}
+									</td>
+									<td>
+										<Button
+											variant='light'
+											className='btn-sm'
+											onClick={() => navigate(`/orders/${order._id}`)}
+										>
+											Details
+										</Button>
+									</td>
+								</tr>
+							))}
+					</tbody>
+				</Table>
 			</Col>
 		</Row>
 	)

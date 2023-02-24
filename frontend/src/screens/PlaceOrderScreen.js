@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -12,23 +12,23 @@ import {
 	Card,
 } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-
+// import payhere from '../payhere'
+// import payhere from 'https://www.payhere.lk/lib/payhere.js'
 import { setPrices } from '../features/cart/cartDataSlice'
 
 import { resetOrderStatus } from '../features/order/orderDataSlice'
 
 import CheckoutSteps from '../components/CheckoutSteps'
 import { createOrder } from '../features/order/orderActions'
+import axios from 'axios'
 export const PlaceOrderScreen = () => {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
-
-	const { token } = useSelector((state) => state.userLogInDetails.userInfo)
+	const [sdkReady, setSdkReady] = useState(false)
 
 	const { isError, isSuccess, message, order, action } = useSelector(
 		(state) => state.orders
 	)
-
 	const cart = useSelector((state) => state.cart)
 	const { cartItems, shippingAddress, paymentMethod } = cart
 
@@ -41,6 +41,9 @@ export const PlaceOrderScreen = () => {
 	const totalPrice = itemsPrice + shippingPrice
 
 	useEffect(() => {
+		// if (!sdkReady) {
+		// 	addPayHereScript()
+		// }
 		if (action === 'createOrder' && isSuccess) {
 			navigate(`/orders/${order._id}`)
 			dispatch(resetOrderStatus())
@@ -49,7 +52,7 @@ export const PlaceOrderScreen = () => {
 			toast.error(message)
 			dispatch(resetOrderStatus())
 		}
-	}, [isSuccess, isError, message, action, navigate, order, dispatch])
+	}, [isSuccess, isError, message, action, navigate, order, dispatch, sdkReady])
 
 	const placeOrderHandler = (e) => {
 		e.preventDefault()
@@ -62,10 +65,27 @@ export const PlaceOrderScreen = () => {
 				paymentMethod,
 				shippingPrice,
 				totalPrice,
-				token,
 			})
 		)
 	}
+	// // console.log(window.payhere)
+	// window.payhere.onCompleted = (orderId) => {
+	// 	console.log('Payment completed. OrderID:' + orderId)
+	// 	alert('New Payhere payment: OrderID: ' + orderId)
+	// 	//Note: validate the payment and show success or failure page to the customer
+	// }
+
+	// // Called when user closes the payment without completing
+	// window.payhere.onDismissed = () => {
+	// 	//Note: Prompt user to pay again or show an error page
+	// 	console.log('Payment dismissed')
+	// }
+
+	// // Called when error happens when initializing payment such as invalid parameters
+	// window.payhere.onError = (error) => {
+	// 	// Note: show an error page
+	// 	console.log('Error:' + error)
+	// }
 	return (
 		<>
 			<CheckoutSteps step1 step2 step3 />
@@ -149,10 +169,55 @@ export const PlaceOrderScreen = () => {
 									type='button'
 									className='btn-block'
 									disabled={cart.cartItems === 0}
+									onClick={async () => {
+										await axios
+											.get('/api/config/payhere', {
+												order_id: 'xxx',
+												amount: 500,
+												currency: 'LKR',
+											})
+											.then(({ data }) => {
+												console.log(data)
+												var payment = {
+													sandbox: true,
+													merchant_id: data.merchantID, // Replace your Merchant ID
+													return_url: undefined, // Important
+													cancel_url: undefined, // Important
+													// notify_url: 'http://sample.com/notify',
+													order_id: 'ItemNo12345',
+													// items: 'Door bell wireles',
+													amount: totalPrice,
+													currency: 'LKR',
+													hash: data.hash, // *Replace with generated hash retrieved from backend
+													first_name: 'Saman',
+													last_name: 'Perera',
+													email: 'samanp@gmail.com',
+													phone: '0771234567',
+													address: 'No.1, Galle Road',
+													city: 'Colombo',
+													country: 'Sri Lanka',
+													delivery_address:
+														'No. 46, Galle road, Kalutara South',
+													delivery_city: 'Kalutara',
+													delivery_country: 'Sri Lanka',
+													custom_1: '',
+													custom_2: '',
+												}
+												// window.payhere.startPayment(payment)
+												// payhere.startPayment(payment)
+											})
+									}}
+								>
+									Pay Now
+								</Button>
+								{/* <Button
+									type='button'
+									className='btn-block'
+									disabled={cart.cartItems === 0}
 									onClick={placeOrderHandler}
 								>
 									Place Order
-								</Button>
+								</Button> */}
 							</ListGroupItem>
 						</ListGroup>
 					</Card>

@@ -51,8 +51,37 @@ const makeOrder = async ({
 	}
 }
 
+const payOrder = async (orderID, paymentResult) => {
+	const token = decodeURI(getCookie('token'))
+	const config = {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`,
+		},
+	}
+	const { data } = await axios.post(
+		`/api/orders/${orderID}/pay`,
+		paymentResult,
+		config
+	)
+	return data
+}
+
+const getMyOrders = async () => {
+	const token = decodeURI(getCookie('token'))
+	const config = {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`,
+		},
+	}
+	const { data } = await axios.get(`/api/orders/myorders`, config)
+	return data
+}
 const orderDataService = {
 	getOrderById,
 	makeOrder,
+	payOrder,
+	getMyOrders,
 }
 export default orderDataService

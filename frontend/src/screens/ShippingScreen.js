@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { registerUser, reset } from '../features/users/userLogInDataSlice'
+import { registerUser, reset } from '../features/users/logInDataSlice'
 import FormContainer from '../components/FormContainer'
 import { toast } from 'react-toastify'
 import { Button, Form } from 'react-bootstrap'
@@ -21,7 +21,7 @@ const ShippingScreen = () => {
 	const submitHandler = (e) => {
 		e.preventDefault()
 		dispatch(addShippingAddress(formFields))
-		navigate('/payment')
+		navigate('/placeorder')
 	}
 	const handleOnChange = (e) => {
 		setFormFields((prevState) => ({

@@ -1,8 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { createOrder, getOrderById } from './orderActions.js'
+import {
+	createOrder,
+	getMyOrders,
+	getOrderById,
+	payOrder,
+} from './orderActions.js'
 
 const initialState = {
-	orderList: [],
+	orderList: null,
 	order: null,
 	isError: false,
 	isSuccess: false,
@@ -20,9 +25,10 @@ export const orderDataSlice = createSlice({
 			state.isError = false
 			state.isSuccess = false
 			state.message = ''
+			state.action = ''
 		},
 		resetOrderData: (state) => {
-			state.orderList = []
+			state.orderList = null
 			state.order = null
 			state.isError = false
 			state.isSuccess = false
@@ -76,6 +82,50 @@ export const orderDataSlice = createSlice({
 				state.isError = true
 				state.message = action.payload
 				state.action = 'getOrderById'
+			})
+			.addCase(payOrder.pending, (state) => {
+				state.isLoading = true
+				state.isSuccess = false
+				state.isError = false
+				state.message = ''
+				state.action = 'payOrder'
+			})
+			.addCase(payOrder.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = true
+				state.isError = false
+				state.message = ''
+				state.order = action.payload
+				state.action = 'payOrder'
+			})
+			.addCase(payOrder.rejected, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = false
+				state.isError = true
+				state.message = action.payload
+				state.action = 'payOrder'
+			})
+			.addCase(getMyOrders.pending, (state) => {
+				state.isLoading = true
+				state.isSuccess = false
+				state.isError = false
+				state.message = ''
+				state.action = 'getMyOrders'
+			})
+			.addCase(getMyOrders.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = true
+				state.isError = false
+				state.message = ''
+				state.orderList = action.payload
+				state.action = 'getMyOrders'
+			})
+			.addCase(getMyOrders.rejected, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = false
+				state.isError = true
+				state.message = action.payload
+				state.action = 'getMyOrders'
 			})
 	},
 })

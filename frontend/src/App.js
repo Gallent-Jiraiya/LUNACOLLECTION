@@ -12,11 +12,19 @@ import LogInScreen from './screens/LogInScreen'
 import RegisterScreen from './screens/RegisterScreen'
 import ProfileScreen from './screens/ProfileScreen'
 import ShippingScreen from './screens/ShippingScreen'
-import PaymentScreen from './screens/PaymentScreen'
 import { PlaceOrderScreen } from './screens/PlaceOrderScreen'
 import { OrderScreen } from './screens/OrderScreen'
+import { getCookie } from './middleware/getCookie'
+import { useDispatch } from 'react-redux'
+import { logout } from './features/users/logInDataSlice'
+import UserListScreen from './screens/UserListScreen'
 
 const App = () => {
+	const token = decodeURI(getCookie('token'))
+	const dispatch = useDispatch()
+	if (!token) {
+		dispatch(logout())
+	}
 	return (
 		<>
 			<Router>
@@ -30,11 +38,11 @@ const App = () => {
 							<Route path='/product/:id' element={<ProductScreen />} />
 							<Route path='/cart' element={<CartScreen />} />
 							<Route path='/shipping' element={<ShippingScreen />} />
-							<Route path='/payment' element={<PaymentScreen />} />
 							<Route path='/placeorder' element={<PlaceOrderScreen />} />
 							<Route path='/cart/:id' element={<CartScreen />} />
 							<Route path='/orders/:id' element={<OrderScreen />} />
 							<Route path='/' element={<HomeScreen />} />
+							<Route path='/admin/userlist' element={<UserListScreen />} />
 							{/* by putting ? after id makes it optional */}
 						</Routes>
 					</Container>

@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import userService from './userService'
+import { createSlice } from '@reduxjs/toolkit'
+import { logInUser, registerUser } from './UserActions'
 
 const userInfo = JSON.parse(localStorage.getItem('userInfo'))
 
@@ -9,61 +9,10 @@ const initialState = {
 	isSuccess: false,
 	isLoading: false,
 	message: '',
+	action: '',
 }
-//action functions
-//called from logIn screen
-export const logInUser = createAsyncThunk(
-	'users/login',
-	async ({ email, password }, thunkAPI) => {
-		try {
-			const config = {
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}
-			const data = await userService.login({ email, password }, config)
-			localStorage.setItem('userInfo', JSON.stringify(data))
-			console.log(data)
-			return data
-			//return await productService.listProduct(id)
-		} catch (error) {
-			const message =
-				(error.response &&
-					error.response.data &&
-					error.response.data.message) ||
-				error.message ||
-				error.toString()
-			return thunkAPI.rejectWithValue(message)
-		}
-	}
-)
-export const registerUser = createAsyncThunk(
-	'users/register',
-	async ({ name, email, password }, thunkAPI) => {
-		try {
-			const config = {
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}
-			const data = await userService.register({ name, email, password }, config)
-			localStorage.setItem('userInfo', JSON.stringify(data))
-			console.log(data)
-			return data
-			//return await productService.listProduct(id)
-		} catch (error) {
-			const message =
-				(error.response &&
-					error.response.data &&
-					error.response.data.message) ||
-				error.message ||
-				error.toString()
-			return thunkAPI.rejectWithValue(message)
-		}
-	}
-)
 
-export const userLogInDataSlice = createSlice({
+export const logInDataSlice = createSlice({
 	name: 'userDetails',
 	initialState,
 	reducers: {
@@ -73,12 +22,12 @@ export const userLogInDataSlice = createSlice({
 		setUserInfoMail: (state, action) => {
 			state.userInfo.email = action.payload
 		},
-		reset: (state) => {
+		resetLogIn: (state) => {
 			state.isLoading = false
 			state.isError = false
 			state.isSuccess = false
 			state.message = ''
-			console.log('userLogin reset called')
+			state.action = ''
 		},
 		logout: (state) => {
 			state.isLoading = false
@@ -87,6 +36,12 @@ export const userLogInDataSlice = createSlice({
 			state.message = ''
 			state.userInfo = null
 			localStorage.removeItem('userInfo')
+			document.cookie =
+				'isAdmin= ; expires = Thu, 01 Jan 1970 00:00:00 GMT path=/;'
+			document.cookie =
+				'token= ; expires = Thu, 01 Jan 1970 00:00:00 GMT path=/;'
+			document.cookie =
+				'name= ; expires = Thu, 01 Jan 1970 00:00:00 GMT path=/;'
 		},
 	},
 	extraReducers: (builder) => {
@@ -104,6 +59,7 @@ export const userLogInDataSlice = createSlice({
 				state.isError = false
 				state.userInfo = action.payload
 				state.message = ''
+				state.action = 'login'
 				localStorage.setItem('userInfo', JSON.stringify(action.payload))
 			})
 			.addCase(logInUser.rejected, (state, action) => {
@@ -112,6 +68,7 @@ export const userLogInDataSlice = createSlice({
 				state.isError = true
 				state.message = action.payload
 				state.userInfo = null
+				state.action = 'login'
 				//state.product = []
 			})
 			//for register user
@@ -120,6 +77,7 @@ export const userLogInDataSlice = createSlice({
 				state.isError = false
 				state.isSuccess = false
 				state.message = ''
+				state.action = 'registerUser'
 			})
 			.addCase(registerUser.fulfilled, (state, action) => {
 				state.isLoading = false
@@ -127,6 +85,7 @@ export const userLogInDataSlice = createSlice({
 				state.isError = false
 				state.userInfo = action.payload
 				state.message = ''
+				state.action = 'registerUser'
 				localStorage.setItem('userInfo', JSON.stringify(action.payload))
 			})
 			.addCase(registerUser.rejected, (state, action) => {
@@ -134,11 +93,12 @@ export const userLogInDataSlice = createSlice({
 				state.isSuccess = false
 				state.isError = true
 				state.message = action.payload
+				state.action = 'registerUser'
 				//state.product = []
 			})
 	},
 })
 
-export const { reset, logout, setUserInfoName, setUserInfoMail } =
-	userLogInDataSlice.actions
-export default userLogInDataSlice.reducer
+export const { resetLogIn, logout, setUserInfoName, setUserInfoMail } =
+	logInDataSlice.actions
+export default logInDataSlice.reducer

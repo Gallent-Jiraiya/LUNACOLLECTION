@@ -18,12 +18,12 @@ function CartScreen() {
 	const { id: proID } = useParams()
 	const [searchParams] = useSearchParams()
 	const qty = searchParams.get('qty')
+	const color = searchParams.get('color')
 	const ob = { id: proID, qty: qty }
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const cart = useSelector((state) => state.cart)
 	const { cartItems, isLoading, isError } = cart
-
 	useEffect(() => {
 		if (proID) {
 			dispatch(addToCart(ob))

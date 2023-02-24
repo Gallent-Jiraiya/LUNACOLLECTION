@@ -12,15 +12,22 @@ import {
 	ListGroupItem,
 	Card,
 } from 'react-bootstrap'
+import {
+	PayPalButtons,
+	PayPalScriptProvider,
+	usePayPalScriptReducer,
+} from '@paypal/react-paypal-js'
 import { Link } from 'react-router-dom'
 import { resetOrderStatus } from '../features/order/orderDataSlice'
 import { createOrder, getOrderById } from '../features/order/orderActions'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
+import axios from 'axios'
 
 export const OrderScreen = () => {
 	const dispatch = useDispatch()
 	const { id: orderID } = useParams()
+	const [clientID, setClientID] = useState()
 	const { order, isError, isSuccess, isLoading, message, action } = useSelector(
 		(state) => state.orders
 	)
@@ -31,20 +38,28 @@ export const OrderScreen = () => {
 			0
 		)
 	}
+	const getClientID = async () => {
+		const { data: clientId } = await axios.get('/api/config/payhere')
+		setClientID(clientId)
+	}
 	useEffect(() => {
+		if (order && !order.isPaid) {
+			getClientID()
+		}
 		if (
 			(action !== 'getOrderById' && !order) ||
-			(action !== 'getOrderById' && order._id !== orderID)
+			(action !== 'getOrderById' && order._id !== orderID) ||
+			(action === 'payOrder' && isSuccess)
 		) {
 			dispatch(getOrderById(orderID))
 		}
-		if (action === 'getOrderById' && isError) {
+		if ((action === 'getOrderById' || action === 'payOrder') && isError) {
 			dispatch(resetOrderStatus())
 		}
 		if (action === 'getOrderById' && isSuccess) {
 			dispatch(resetOrderStatus())
 		}
-	}, [isSuccess, isError, message, action, order, orderID, dispatch])
+	}, [action, dispatch, isError, isSuccess, order, orderID])
 
 	return isLoading ? (
 		<Loader />
@@ -151,10 +166,60 @@ export const OrderScreen = () => {
 									<Col>${order.totalPrice}</Col>
 								</Row>
 							</ListGroupItem>
+							{!order.isPaid && <ListGroupItem> </ListGroupItem>}
 						</ListGroup>
 					</Card>
 				</Col>
 			</Row>
+		</>
+	)
+}
+// Custom component to wrap the PayPalButtons and handle currency changes
+const ButtonWrapper = ({ currency, showSpinner, amount }) => {
+	// usePayPalScriptReducer can be use only inside children of PayPalScriptProviders
+	// This is the main reason to wrap the PayPalButtons in a new component
+	const [{ options, isPending }, dispatch] = usePayPalScriptReducer()
+
+	useEffect(() => {
+		dispatch({
+			type: 'resetOptions',
+			value: {
+				...options,
+				currency: currency,
+			},
+		})
+	}, [currency, showSpinner])
+
+	return (
+		<>
+			{showSpinner && isPending && <div className='spinner' />}
+			<PayPalButtons
+				disabled={false}
+				forceReRender={[amount, currency]}
+				fundingSource={undefined}
+				createOrder={(data, actions) => {
+					return actions.order
+						.create({
+							purchase_units: [
+								{
+									amount: {
+										currency_code: currency,
+										value: amount,
+									},
+								},
+							],
+						})
+						.then((orderId) => {
+							// Your code here after create the order
+							return orderId
+						})
+				}}
+				onApprove={function (data, actions) {
+					return actions.order.capture().then(function () {
+						// Your code here after capture the order
+					})
+				}}
+			/>
 		</>
 	)
 }
