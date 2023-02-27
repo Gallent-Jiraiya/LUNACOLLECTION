@@ -3,31 +3,24 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import {
-	Button,
 	Col,
 	Row,
 	ListGroup,
 	Image,
-	Cart,
 	ListGroupItem,
 	Card,
 } from 'react-bootstrap'
-import {
-	PayPalButtons,
-	PayPalScriptProvider,
-	usePayPalScriptReducer,
-} from '@paypal/react-paypal-js'
+
 import { Link } from 'react-router-dom'
 import { resetOrderStatus } from '../features/order/orderDataSlice'
-import { createOrder, getOrderById } from '../features/order/orderActions'
+import { getOrderById } from '../features/order/orderActions'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
-import axios from 'axios'
 
 export const OrderScreen = () => {
 	const dispatch = useDispatch()
 	const { id: orderID } = useParams()
-	const [clientID, setClientID] = useState()
+	const [orderDetails, setOrderDetails] = useState()
 	const { order, isError, isSuccess, isLoading, message, action } = useSelector(
 		(state) => state.orders
 	)
@@ -38,29 +31,19 @@ export const OrderScreen = () => {
 			0
 		)
 	}
-	const getClientID = async () => {
-		const { data: clientId } = await axios.get('/api/config/payhere')
-		setClientID(clientId)
-	}
+
 	useEffect(() => {
-		if (order && !order.isPaid) {
-			getClientID()
-		}
 		if (
-			(action !== 'getOrderById' && !order) ||
-			(action !== 'getOrderById' && order._id !== orderID) ||
-			(action === 'payOrder' && isSuccess)
+			(orderID && !orderDetails) ||
+			(orderID && orderDetails && !(orderDetails._id === order._id))
 		) {
 			dispatch(getOrderById(orderID))
 		}
-		if ((action === 'getOrderById' || action === 'payOrder') && isError) {
-			dispatch(resetOrderStatus())
-		}
-		if (action === 'getOrderById' && isSuccess) {
-			dispatch(resetOrderStatus())
-		}
-	}, [action, dispatch, isError, isSuccess, order, orderID])
-
+	}, [action, dispatch, isError, isSuccess, order, orderDetails, orderID])
+	if (action === 'getOrderById' && isSuccess) {
+		setOrderDetails(order)
+		dispatch(resetOrderStatus())
+	}
 	return isLoading ? (
 		<Loader />
 	) : isError ? (
@@ -88,6 +71,16 @@ export const OrderScreen = () => {
 								{order.shippingAddress.address},{order.shippingAddress.city},
 								{order.shippingAddress.postalCode}
 							</p>
+							<p>
+								<strong>Order Shipped: </strong>
+								{order.isShipped ? (
+									<Message variant='success'>
+										Delivered on {order.shippedAt}
+									</Message>
+								) : (
+									<i className='fas fa-times' style={{ color: 'red' }}></i>
+								)}
+							</p>
 							{order.isDelivered ? (
 								<Message variant='success'>
 									Delivered on {order.deliveredAt}
@@ -102,11 +95,10 @@ export const OrderScreen = () => {
 								<strong>Method:</strong>
 								{order.paymentMethod}
 							</p>
-							{order.isPaid ? (
-								<Message variant='success'>Paid on {order.paidAt}</Message>
-							) : (
-								<Message variant='danger'>Not Paid</Message>
-							)}
+
+							<Message variant='success'>
+								Paid on {order.paymentResult.update_time.substring(0, 10)}
+							</Message>
 						</ListGroup.Item>
 						<ListGroup.Item>
 							<h2>Order Items</h2>
@@ -166,60 +158,10 @@ export const OrderScreen = () => {
 									<Col>${order.totalPrice}</Col>
 								</Row>
 							</ListGroupItem>
-							{!order.isPaid && <ListGroupItem> </ListGroupItem>}
 						</ListGroup>
 					</Card>
 				</Col>
 			</Row>
-		</>
-	)
-}
-// Custom component to wrap the PayPalButtons and handle currency changes
-const ButtonWrapper = ({ currency, showSpinner, amount }) => {
-	// usePayPalScriptReducer can be use only inside children of PayPalScriptProviders
-	// This is the main reason to wrap the PayPalButtons in a new component
-	const [{ options, isPending }, dispatch] = usePayPalScriptReducer()
-
-	useEffect(() => {
-		dispatch({
-			type: 'resetOptions',
-			value: {
-				...options,
-				currency: currency,
-			},
-		})
-	}, [currency, showSpinner])
-
-	return (
-		<>
-			{showSpinner && isPending && <div className='spinner' />}
-			<PayPalButtons
-				disabled={false}
-				forceReRender={[amount, currency]}
-				fundingSource={undefined}
-				createOrder={(data, actions) => {
-					return actions.order
-						.create({
-							purchase_units: [
-								{
-									amount: {
-										currency_code: currency,
-										value: amount,
-									},
-								},
-							],
-						})
-						.then((orderId) => {
-							// Your code here after create the order
-							return orderId
-						})
-				}}
-				onApprove={function (data, actions) {
-					return actions.order.capture().then(function () {
-						// Your code here after capture the order
-					})
-				}}
-			/>
 		</>
 	)
 }

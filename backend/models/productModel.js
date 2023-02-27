@@ -24,13 +24,14 @@ const productSchema = mongoose.Schema(
 			type: String,
 			required: true,
 		},
-		brand: {
+		shortDescription: {
 			type: String,
 			required: true,
 		},
 		category: {
-			type: String,
+			type: mongoose.Schema.Types.ObjectId,
 			required: true,
+			ref: 'Category',
 		},
 		description: {
 			type: String,

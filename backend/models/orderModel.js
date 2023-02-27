@@ -7,6 +7,7 @@ const orderSchema = mongoose.Schema(
 			required: true,
 			ref: 'User',
 		},
+		// variatons:[{color:{type:String,required:true},sizes:[{type:String,required:true}],stock:{type:Number,required:true}}],
 		orderItems: [
 			{
 				name: { type: String, required: true },
@@ -36,23 +37,24 @@ const orderSchema = mongoose.Schema(
 			update_time: { type: String },
 			email_address: { type: String },
 		},
-		shippingPrice: {
-			type: Number,
-			required: true,
-			default: 0.0,
-		},
+
 		totalPrice: {
 			type: Number,
 			required: true,
 			default: 0.0,
 		},
-		isPaid: {
+		isShipped: {
 			type: Boolean,
 			required: true,
 			default: false,
 		},
-		paidAt: {
+		shippedAt: {
 			type: Date,
+		},
+		shippingPrice: {
+			type: Number,
+			required: true,
+			default: 0,
 		},
 		isDelivered: {
 			type: Boolean,

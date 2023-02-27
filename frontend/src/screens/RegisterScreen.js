@@ -16,7 +16,7 @@ function RegisterScreen() {
 	const [passwordMessage, setPasswordMessage] = useState('')
 	const navigate = useNavigate()
 	const dispatch = useDispatch()
-	const userLogInDetails = useSelector((state) => state.userLogInDetails)
+	const userLogInDetails = useSelector((state) => state.logInDetails)
 	const { userInfo, isError, isLoading, isSuccess, message } = userLogInDetails
 
 	useEffect(() => {
@@ -39,11 +39,9 @@ function RegisterScreen() {
 		isSuccess,
 		message,
 		isError,
-		resetLogIn,
 		dispatch,
 		passwordMessage,
 	])
-	console.log(passwordMessage)
 	const submitHandler = (e) => {
 		e.preventDefault()
 		if (password !== confirmPassword) {

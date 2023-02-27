@@ -7,6 +7,7 @@ import orderDataReducer from './features/order/orderDataSlice'
 import logInDataReducer from './features/users/logInDataSlice'
 import profileDataReducer from './features/users/profileDataSlice'
 import userListDataReducer from './features/users/userListDataSlice'
+import usersDataReducer from './features/users/usersDataSlice'
 
 const store = configureStore({
 	reducer: {
@@ -17,6 +18,7 @@ const store = configureStore({
 		profileDetails: profileDataReducer,
 		orders: orderDataReducer,
 		allUsers: userListDataReducer,
+		users: usersDataReducer,
 	},
 })
 

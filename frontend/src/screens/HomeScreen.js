@@ -5,8 +5,8 @@ import Product from '../components/Product'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import { Row, Col } from 'react-bootstrap'
+import { listProducts } from '../features/products/productAction'
 //import axios from 'axios'
-import { listProducts, reset } from '../features/products/productListDataSlice'
 
 const HomeScreen = () => {
 	//const [products, setProducts] = useState([])
@@ -25,10 +25,10 @@ const HomeScreen = () => {
 		// }
 		// fetchProducts()
 
-	 if (products.length === 0) {
+		if (!products) {
 			dispatch(listProducts())
-		} 
-	}, [dispatch])
+		}
+	}, [dispatch, products])
 
 	return (
 		<>
@@ -39,11 +39,12 @@ const HomeScreen = () => {
 				<Message variant='danger'>{message}</Message>
 			) : (
 				<Row>
-					{products.map((product) => (
-						<Col key={product._id} sm={12} md={6} lg={4} xl={3}>
-							<Product product={product} />
-						</Col>
-					))}
+					{products &&
+						products.map((product) => (
+							<Col key={product._id} sm={12} md={6} lg={4} xl={3}>
+								<Product product={product} />
+							</Col>
+						))}
 				</Row>
 			)}
 		</>

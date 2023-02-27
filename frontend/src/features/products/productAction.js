@@ -1,66 +1,77 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import orderDataService from './orderDataService'
+import productService from './productService'
 
-//addProducts
-export const createOrder = createAsyncThunk(
-	'order/add',
-	async (object, thunkAPI) => {
-		try {
-			// console.log('createOrdergetCalled')
-			const response = await orderDataService.makeOrder(object)
-			return response
-		} catch (error) {
-			const message =
-				(error.response &&
-					error.response.data &&
-					error.response.data.message) ||
-				error.message ||
-				error.toString()
-			return thunkAPI.rejectWithValue(message)
-		}
-	}
-)
-
-//get Order by id
-export const getOrderById = createAsyncThunk(
-	'order/get',
-	async (id, thunkAPI) => {
-		try {
-			return await orderDataService.getOrderById(id)
-		} catch (error) {
-			const message =
-				(error.response &&
-					error.response.data &&
-					error.response.data.message) ||
-				error.message ||
-				error.toString()
-			return thunkAPI.rejectWithValue(message)
-		}
-	}
-)
-//pay order by id
-export const payOrder = createAsyncThunk(
-	'order/pay',
-	async (orderID, paymentResult, thunkAPI) => {
-		try {
-			return await orderDataService.payOrder(orderID, paymentResult)
-		} catch (error) {
-			const message =
-				(error.response &&
-					error.response.data &&
-					error.response.data.message) ||
-				error.message ||
-				error.toString()
-			return thunkAPI.rejectWithValue(message)
-		}
-	}
-)
-//get Logged in users all orders
-export const getMyOrders = createAsyncThunk(
-	'order/myOrders',
+//getProducts
+export const listProducts = createAsyncThunk(
+	'products/getAll',
 	async (_, thunkAPI) => {
 		try {
-			return await orderDataService.getMyOrders()
+			return await productService.getProducts()
+		} catch (error) {
+			const message =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString()
+			return thunkAPI.rejectWithValue(message)
+		}
+	}
+)
+export const getProduct = createAsyncThunk(
+	'products/get',
+	async (id, thunkAPI) => {
+		try {
+			return await productService.listProduct(id)
+		} catch (error) {
+			const message =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString()
+			return thunkAPI.rejectWithValue(message)
+		}
+	}
+)
+export const addProduct = createAsyncThunk(
+	'product/add',
+	async (object, thunkAPI) => {
+		try {
+			return await productService.addProduct(object)
+		} catch (error) {
+			const message =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString()
+			return thunkAPI.rejectWithValue(message)
+		}
+	}
+)
+export const deleteProduct = createAsyncThunk(
+	'product/delete',
+	async (id, thunkAPI) => {
+		try {
+			return await productService.deleteProduct(id)
+		} catch (error) {
+			const message =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString()
+			return thunkAPI.rejectWithValue(message)
+		}
+	}
+)
+export const updateProduct = createAsyncThunk(
+	'product/update',
+	async ({ id, object }, thunkAPI) => {
+		try {
+			console.log(id)
+			return await productService.updateProduct(id, object)
 		} catch (error) {
 			const message =
 				(error.response &&

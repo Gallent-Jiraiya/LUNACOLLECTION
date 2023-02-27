@@ -21,10 +21,16 @@ export const cartDataSlice = createSlice({
 	name: 'cart',
 	initialState,
 	reducers: {
-		reset: (state) => {
-			state.isLoading = false
+		resetCart: (state) => {
+			state.cartItems = []
+			state.shippingAddress = shippingAddress ? shippingAddress : {}
+			state.paymentMethod = 'PayPal'
+			state.itemsPrice = 0
+			state.shippingPrice = 0
+			state.totalPrice = 0
 			state.isError = false
 			state.isSuccess = false
+			state.isLoading = false
 			state.message = ''
 		},
 		setPrices: (state, action) => {
@@ -97,7 +103,7 @@ export const cartDataSlice = createSlice({
 })
 
 export const {
-	reset,
+	resetCart,
 	removeFromCart,
 	addShippingAddress,
 	savePaymentMethod,

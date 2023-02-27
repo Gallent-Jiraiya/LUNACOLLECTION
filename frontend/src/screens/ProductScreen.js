@@ -7,7 +7,7 @@ import Form from 'react-bootstrap/Form'
 import Rating from '../components/Rating'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
-import { listProduct } from '../features/products/productDataSlice'
+import { getProduct } from '../features/products/productAction'
 
 const ProductScreen = () => {
 	const [qty, setQty] = useState(1)
@@ -19,7 +19,7 @@ const ProductScreen = () => {
 	const navigate = useNavigate()
 
 	useEffect(() => {
-		dispatch(listProduct(proID))
+		dispatch(getProduct(proID))
 	}, [dispatch, proID])
 
 	const handleAddToCart = () => {

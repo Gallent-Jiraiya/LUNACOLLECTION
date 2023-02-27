@@ -13,13 +13,7 @@ const getOrderById = async (id) => {
 	return data
 }
 
-const makeOrder = async ({
-	orderItems,
-	shippingAddress,
-	paymentMethod,
-	shippingPrice,
-	totalPrice,
-}) => {
+const makeOrder = async (object) => {
 	const token = decodeURI(getCookie('token'))
 	const config = {
 		headers: {
@@ -27,17 +21,7 @@ const makeOrder = async ({
 			Authorization: `Bearer ${token}`,
 		},
 	}
-	const { data } = await axios.post(
-		`/api/orders`,
-		{
-			orderItems,
-			shippingAddress,
-			paymentMethod,
-			shippingPrice,
-			totalPrice,
-		},
-		config
-	)
+	const { data } = await axios.post(`/api/orders`, object, config)
 
 	return {
 		_id: data._id,
@@ -46,8 +30,8 @@ const makeOrder = async ({
 		shippingAddress: data.shippingAddress,
 		paymentMethod: data.paymentMethod,
 		paymentResult: data.paymentResult,
-		shippingPrice: parseInt(shippingPrice),
-		totalPrice: parseInt(totalPrice),
+		shippingPrice: parseInt(data.shippingPrice),
+		totalPrice: parseInt(data.totalPrice),
 	}
 }
 

@@ -1,6 +1,8 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import colors from 'colors'
+import AWS from 'aws-sdk'
+import cors from 'cors'
 import { notFound, errorHandler } from './middleware/errorMiddleware.js'
 import connectDB from './config/db.js'
 
@@ -8,13 +10,25 @@ import productRoutes from './routes/productRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
 import cartRoutes from './routes/cartRoutes.js'
+import categoryRoutes from './routes/categoryRoutes.js'
+import md5 from 'md5'
 
 //this connects env file with the config file
 dotenv.config()
 connectDB()
 
+const region = 'ap-south-1'
+const myCredentials = {
+	accessKeyId: process.env.ACCESSKEYIDS3BUCKET,
+	secretAccessKey: process.env.SECRETKEYS3BUCKET,
+}
+export const s3 = new AWS.S3({
+	credentials: myCredentials,
+	region: region,
+})
 const app = express()
 
+app.use(cors())
 app.use(express.json())
 
 app.get('/', (req, res) => {
@@ -29,9 +43,15 @@ app.use('/api/users', userRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/cart', cartRoutes)
+app.use('/api/categories', categoryRoutes)
+
+app.get('/api/config/paypal', (req, res) => {
+	res.json(process.env.PAYPAL_CLIENT_ID)
+})
 
 app.use(notFound)
 
+app.use(errorHandler)
 app.use(errorHandler)
 
 const PORT = process.env.PORT || 5000

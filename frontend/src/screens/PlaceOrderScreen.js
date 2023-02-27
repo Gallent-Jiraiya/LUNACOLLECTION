@@ -12,15 +12,12 @@ import {
 	Card,
 } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-// import payhere from '../payhere'
-// import payhere from 'https://www.payhere.lk/lib/payhere.js'
-import { setPrices } from '../features/cart/cartDataSlice'
-
+import { resetCart, setPrices } from '../features/cart/cartDataSlice'
 import { resetOrderStatus } from '../features/order/orderDataSlice'
-
 import CheckoutSteps from '../components/CheckoutSteps'
 import { createOrder } from '../features/order/orderActions'
 import axios from 'axios'
+import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js'
 export const PlaceOrderScreen = () => {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
@@ -39,14 +36,18 @@ export const PlaceOrderScreen = () => {
 	)
 	const shippingPrice = 10
 	const totalPrice = itemsPrice + shippingPrice
-
+	const addPayPalScript = async () => {
+		const { data: clientID } = await axios.get('/api/config/paypal')
+		setSdkReady(clientID)
+	}
 	useEffect(() => {
-		// if (!sdkReady) {
-		// 	addPayHereScript()
-		// }
+		if (!sdkReady) {
+			addPayPalScript()
+		}
 		if (action === 'createOrder' && isSuccess) {
 			navigate(`/orders/${order._id}`)
 			dispatch(resetOrderStatus())
+			dispatch(resetCart())
 		}
 		if (action === 'createOrder' && isError) {
 			toast.error(message)
@@ -54,10 +55,7 @@ export const PlaceOrderScreen = () => {
 		}
 	}, [isSuccess, isError, message, action, navigate, order, dispatch, sdkReady])
 
-	const placeOrderHandler = (e) => {
-		e.preventDefault()
-		dispatch(setPrices({ totalPrice, shippingPrice, itemsPrice }))
-		console.log(cartItems)
+	const placeOrderHandler = (details) => {
 		dispatch(
 			createOrder({
 				orderItems: cartItems,
@@ -65,27 +63,15 @@ export const PlaceOrderScreen = () => {
 				paymentMethod,
 				shippingPrice,
 				totalPrice,
+				paymentResult: {
+					id: details.id,
+					status: details.status,
+					update_time: details.update_time,
+					email_address: details.payer.email_address,
+				},
 			})
 		)
 	}
-	// // console.log(window.payhere)
-	// window.payhere.onCompleted = (orderId) => {
-	// 	console.log('Payment completed. OrderID:' + orderId)
-	// 	alert('New Payhere payment: OrderID: ' + orderId)
-	// 	//Note: validate the payment and show success or failure page to the customer
-	// }
-
-	// // Called when user closes the payment without completing
-	// window.payhere.onDismissed = () => {
-	// 	//Note: Prompt user to pay again or show an error page
-	// 	console.log('Payment dismissed')
-	// }
-
-	// // Called when error happens when initializing payment such as invalid parameters
-	// window.payhere.onError = (error) => {
-	// 	// Note: show an error page
-	// 	console.log('Error:' + error)
-	// }
 	return (
 		<>
 			<CheckoutSteps step1 step2 step3 />
@@ -110,7 +96,7 @@ export const PlaceOrderScreen = () => {
 							<h2>Order Items</h2>
 
 							{cart.cartItems.length === 0 ? (
-								toast.error('Your Cart is Empty')
+								<p>No items in the cart</p>
 							) : (
 								<ListGroup variant='flush'>
 									{cart.cartItems.map((item, index) => (
@@ -130,7 +116,8 @@ export const PlaceOrderScreen = () => {
 													</Link>
 												</Col>
 												<Col md={4}>
-													{item.qty} x ${item.price} = ${item.price * item.qty}
+													{item.qty} x Rs.{item.price} = Rs.
+													{item.price * item.qty}
 												</Col>
 											</Row>
 										</ListGroupItem>
@@ -149,75 +136,49 @@ export const PlaceOrderScreen = () => {
 							<ListGroupItem>
 								<Row>
 									<Col>Items</Col>
-									<Col>${itemsPrice}</Col>
+									<Col>Rs.{itemsPrice}</Col>
 								</Row>
 							</ListGroupItem>
 							<ListGroupItem>
 								<Row>
 									<Col>Shipping</Col>
-									<Col>${shippingPrice}</Col>
+									<Col>Rs.{shippingPrice}</Col>
 								</Row>
 							</ListGroupItem>
 							<ListGroupItem>
 								<Row>
 									<Col>Total</Col>
-									<Col>${totalPrice}</Col>
+									<Col>Rs.{totalPrice}</Col>
 								</Row>
 							</ListGroupItem>
 							<ListGroupItem>
-								<Button
-									type='button'
-									className='btn-block'
-									disabled={cart.cartItems === 0}
-									onClick={async () => {
-										await axios
-											.get('/api/config/payhere', {
-												order_id: 'xxx',
-												amount: 500,
-												currency: 'LKR',
-											})
-											.then(({ data }) => {
-												console.log(data)
-												var payment = {
-													sandbox: true,
-													merchant_id: data.merchantID, // Replace your Merchant ID
-													return_url: undefined, // Important
-													cancel_url: undefined, // Important
-													// notify_url: 'http://sample.com/notify',
-													order_id: 'ItemNo12345',
-													// items: 'Door bell wireles',
-													amount: totalPrice,
-													currency: 'LKR',
-													hash: data.hash, // *Replace with generated hash retrieved from backend
-													first_name: 'Saman',
-													last_name: 'Perera',
-													email: 'samanp@gmail.com',
-													phone: '0771234567',
-													address: 'No.1, Galle Road',
-													city: 'Colombo',
-													country: 'Sri Lanka',
-													delivery_address:
-														'No. 46, Galle road, Kalutara South',
-													delivery_city: 'Kalutara',
-													delivery_country: 'Sri Lanka',
-													custom_1: '',
-													custom_2: '',
-												}
-												// window.payhere.startPayment(payment)
-												// payhere.startPayment(payment)
-											})
-									}}
-								>
-									Pay Now
-								</Button>
-								{/* <Button
-									type='button'
-									className='btn-block'
-									disabled={cart.cartItems === 0}
-									onClick={placeOrderHandler}
-								>
-									Place Order
-								</Button> */}
+								{sdkReady && cart.cartItems.length > 0 && (
+									<PayPalScriptProvider options={{ 'client-id': sdkReady }}>
+										<PayPalButtons
+											disabled={false}
+											forceReRender={[totalPrice, 'USD']}
+											fundingSource={undefined}
+											createOrder={(data, actions) => {
+												return actions.order.create({
+													purchase_units: [
+														{
+															amount: {
+																currency_code: 'USD',
+																value: totalPrice,
+															},
+														},
+													],
+												})
+											}}
+											onApprove={(data, actions) => {
+												return actions.order.capture().then((details) => {
+													// Your code here after capture the order
+													placeOrderHandler(details)
+												})
+											}}
+										/>
+									</PayPalScriptProvider>
+								)}
 							</ListGroupItem>
 						</ListGroup>
 					</Card>

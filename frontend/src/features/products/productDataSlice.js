@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import productService from './productService'
+import { createSlice } from '@reduxjs/toolkit'
+import { addProduct, getProduct, updateProduct } from './productAction'
 
 const initialState = {
 	product: { reviews: [] },
@@ -7,59 +7,97 @@ const initialState = {
 	isSuccess: false,
 	isLoading: false,
 	message: '',
+	action: '',
 }
 
 //getProducts
-export const listProduct = createAsyncThunk(
-	'products/get/:id',
-	async (id, thunkAPI) => {
-		try {
-			return await productService.listProduct(id)
-		} catch (error) {
-			const message =
-				(error.response &&
-					error.response.data &&
-					error.response.data.message) ||
-				error.message ||
-				error.toString()
-			return thunkAPI.rejectWithValue(message)
-		}
-	}
-)
 
 export const productDataSlice = createSlice({
 	name: 'productDetails',
 	initialState,
 	reducers: {
-		reset: (state) => {
+		resetProductStatus: (state) => {
 			state.isLoading = false
 			state.isError = false
 			state.isSuccess = false
 			state.message = ''
+			state.action = ''
+		},
+		resetProductData: (state) => {
+			state.product = { reviews: [] }
+			state.isLoading = false
+			state.isError = false
+			state.isSuccess = false
+			state.message = ''
+			state.action = ''
 		},
 	},
 	extraReducers: (builder) => {
 		builder
-			.addCase(listProduct.pending, (state) => {
+			.addCase(getProduct.pending, (state) => {
 				state.isLoading = true
 				state.isSuccess = false
+				state.isError = false
+				state.action = 'getProduct'
 			})
-			.addCase(listProduct.fulfilled, (state, action) => {
+			.addCase(getProduct.fulfilled, (state, action) => {
 				state.isLoading = false
 				state.isError = false
 				state.message = ''
 				state.isSuccess = true
 				state.product = action.payload
+				state.action = 'getProduct'
 			})
-			.addCase(listProduct.rejected, (state, action) => {
+			.addCase(getProduct.rejected, (state, action) => {
 				state.isLoading = false
 				state.isSuccess = false
 				state.isError = true
 				state.message = action.payload
-				//state.product = []
+				state.action = 'getProduct'
+			})
+			.addCase(addProduct.pending, (state) => {
+				state.isLoading = true
+				state.isSuccess = false
+				state.isError = false
+				state.action = 'addProduct'
+			})
+			.addCase(addProduct.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.isError = false
+				state.message = ''
+				state.isSuccess = true
+				state.product = action.payload
+				state.action = 'addProduct'
+			})
+			.addCase(addProduct.rejected, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = false
+				state.isError = true
+				state.message = action.payload
+				state.action = 'addProduct'
+			})
+			.addCase(updateProduct.pending, (state) => {
+				state.isLoading = true
+				state.isSuccess = false
+				state.isError = false
+				state.action = 'updateProduct'
+			})
+			.addCase(updateProduct.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.isError = false
+				state.message = ''
+				state.isSuccess = true
+				state.action = 'updateProduct'
+			})
+			.addCase(updateProduct.rejected, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = false
+				state.isError = true
+				state.message = action.payload
+				state.action = 'updateProduct'
 			})
 	},
 })
 
-export const { reset } = productDataSlice.actions
+export const { resetProductStatus, resetProductData } = productDataSlice.actions
 export default productDataSlice.reducer

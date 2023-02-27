@@ -18,6 +18,9 @@ import { getCookie } from './middleware/getCookie'
 import { useDispatch } from 'react-redux'
 import { logout } from './features/users/logInDataSlice'
 import UserListScreen from './screens/UserListScreen'
+import UserEditScreen from './screens/UserEditScreen'
+import ProductListScreen from './screens/ProductListScreen'
+import AddProductScreen from './screens/AddProductScreen'
 
 const App = () => {
 	const token = decodeURI(getCookie('token'))
@@ -43,6 +46,13 @@ const App = () => {
 							<Route path='/orders/:id' element={<OrderScreen />} />
 							<Route path='/' element={<HomeScreen />} />
 							<Route path='/admin/userlist' element={<UserListScreen />} />
+							<Route path='/admin/user/:id/edit' element={<UserEditScreen />} />
+							<Route
+								path='/admin/productlist'
+								element={<ProductListScreen />}
+							/>
+							<Route path='/admin/product/' element={<AddProductScreen />} />
+							<Route path='/admin/product/:id' element={<AddProductScreen />} />
 							{/* by putting ? after id makes it optional */}
 						</Routes>
 					</Container>
