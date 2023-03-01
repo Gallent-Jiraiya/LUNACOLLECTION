@@ -10,7 +10,7 @@ const listProduct = async (id) => {
 }
 
 //retrieve products
-const getProducts = async () => {
+const getProducts = async ({ keyword = '', pageNumber = '' }) => {
 	const token = decodeURI(getCookie('token'))
 	const config = {
 		headers: {
@@ -18,9 +18,25 @@ const getProducts = async () => {
 			Authorization: `Bearer ${token}`,
 		},
 	}
-	const response = await axios.get(API_URL, config)
+	const response = await axios.get(
+		`/api/products?keyword=${keyword}&pageNumber=${pageNumber}`,
+		config
+	)
 	return response.data
-} //retrieve products
+}
+//retrieve all products
+const getProductsAll = async () => {
+	const token = decodeURI(getCookie('token'))
+	const config = {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`,
+		},
+	}
+	const response = await axios.get(`/api/products/all`, config)
+	return response.data
+}
+//delete product
 const deleteProduct = async (id) => {
 	const token = decodeURI(getCookie('token'))
 	const config = {
@@ -61,5 +77,6 @@ const productService = {
 	deleteProduct,
 	updateProduct,
 	addProduct,
+	getProductsAll,
 }
 export default productService

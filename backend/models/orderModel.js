@@ -43,27 +43,23 @@ const orderSchema = mongoose.Schema(
 			required: true,
 			default: 0.0,
 		},
-		isShipped: {
-			type: Boolean,
+		shipping: {
+			type: Object,
 			required: true,
-			default: false,
+			default: { isShipped: false, shippedAt: String },
 		},
-		shippedAt: {
-			type: Date,
-		},
+
 		shippingPrice: {
 			type: Number,
 			required: true,
 			default: 0,
 		},
-		isDelivered: {
-			type: Boolean,
+		delivery: {
+			type: Object,
 			required: true,
-			default: false,
+			default: { isDelivered: false, deliveredAt: String },
 		},
-		deliveredAt: {
-			type: Date,
-		},
+		completed: { type: Boolean, required: true, default: false },
 	},
 	{
 		timestamps: true,

@@ -6,6 +6,7 @@ import { logout } from '../features/users/logInDataSlice'
 import { resetWithProfile } from '../features/users/profileDataSlice'
 import { useNavigate } from 'react-router-dom'
 import { resetUsersList } from '../features/users/userListDataSlice'
+import SearchBox from './SearchBox'
 
 const Header = () => {
 	const dispatch = useDispatch()
@@ -33,6 +34,7 @@ const Header = () => {
 					<Navbar.Toggle aria-controls='basic-navbar-nav' className='ms-auto' />
 					<Navbar.Collapse id='basic-navbar-nav'>
 						<Nav className='ms-auto'>
+							<SearchBox />
 							<LinkContainer to='/'>
 								<Nav.Link>
 									<i className='fas fa-house'></i>Home
@@ -67,6 +69,9 @@ const Header = () => {
 							)}
 							{userInfo && userInfo.isAdmin && (
 								<NavDropdown title={'Admin'} id='adminmenu'>
+									<LinkContainer to='/admin/userlist'>
+										<NavDropdown.Item>Overview</NavDropdown.Item>
+									</LinkContainer>
 									<LinkContainer to='/admin/userlist'>
 										<NavDropdown.Item>Users</NavDropdown.Item>
 									</LinkContainer>

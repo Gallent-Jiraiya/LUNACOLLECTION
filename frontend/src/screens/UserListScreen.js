@@ -1,3 +1,6 @@
+import { Box } from '@mui/material'
+import { DataGrid, GridToolbar } from '@mui/x-data-grid'
+import { Popconfirm } from 'antd'
 import { useEffect } from 'react'
 import { Button, Table } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
@@ -37,10 +40,61 @@ const UserListScreen = () => {
 		}
 	}, [dispatch, navigate, userInfo])
 	const deleteHandler = (id) => {
-		if (window.confirm('Are you sure ?')) {
-			dispatch(deleteUser(id))
-		}
+		dispatch(deleteUser(id))
 	}
+	const columns = [
+		{ field: '_id', flex: 1, headerName: 'ID' },
+		{
+			field: 'name',
+			flex: 1,
+			headerName: 'NAME',
+		},
+		{ field: 'email', flex: 1, headerName: 'EMAIL' },
+		{
+			field: 'isAdmin',
+			flex: 1,
+			headerName: 'ADMIN',
+
+			renderCell: ({ value }) =>
+				value ? (
+					<i className='fas fa-check' style={{ color: 'green' }}></i>
+				) : (
+					<i className='fas fa-times' style={{ color: 'red' }}></i>
+				),
+		},
+
+		{
+			field: 'actions',
+			flex: 1,
+			headerName: 'Actions',
+			headerAlign: 'center',
+			renderCell: ({ id }) => {
+				return (
+					<>
+						<Button
+							variant='light'
+							className='btn-sm'
+							onClick={() => navigate(`/admin/user/${id}/edit`)}
+						>
+							<i className='fas fa-edit'></i>
+						</Button>
+
+						<Popconfirm
+							title='Delete the Product'
+							description='Are you sure to delete this product?'
+							onConfirm={() => deleteHandler(id)}
+							okText='Yes'
+							cancelText='No'
+						>
+							<Button variant='danger' className='btn-sm'>
+								<i className='fas fa-trash'></i>
+							</Button>
+						</Popconfirm>
+					</>
+				)
+			},
+		},
+	]
 	return (
 		<>
 			<h1>Users</h1>
@@ -49,58 +103,31 @@ const UserListScreen = () => {
 			) : allUsersReduxState.isError ? (
 				<Message variant={'danger'}>{allUsersReduxState.message}</Message>
 			) : (
-				<Table striped bordered hover responsive className='table-sm'>
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>NAME</th>
-							<th>EMAIL</th>
-							<th>ADMIN</th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-						{allUsersReduxState.usersList ? (
-							allUsersReduxState.usersList.map((user) => (
-								<tr key={user._id}>
-									<td>{user._id}</td>
-									<td>{user.name}</td>
-									<td>
-										<a href={`mailto:${user.email}`}>{user.email}</a>
-									</td>
-									<td>
-										{user.isAdmin ? (
-											<i
-												className='fas fa-check'
-												style={{ color: 'green' }}
-											></i>
-										) : (
-											<i className='fas fa-times' style={{ color: 'red' }}></i>
-										)}
-									</td>
-									<td>
-										<Button
-											variant='light'
-											className='btn-sm'
-											onClick={() => navigate(`/admin/user/${user._id}/edit`)}
-										>
-											<i className='fas fa-edit'></i>
-										</Button>
-										<Button
-											variant='danger'
-											className='btn-sm'
-											onClick={() => deleteHandler(user._id)}
-										>
-											<i className='fas fa-trash'></i>
-										</Button>
-									</td>
-								</tr>
-							))
-						) : (
-							<></>
-						)}
-					</tbody>
-				</Table>
+				<Box
+					m='0 0 0 0'
+					height='75vh'
+					sx={{
+						'& .MuiDataGrid-root': {
+							border: 'none',
+						},
+						'& .MuiDataGrid-cell': {
+							borderBottom: 'none',
+						},
+						'& .name-column--cell': {
+							color: 'green',
+						},
+						'& .MuiDataGrid-columnHeaders': {
+							borderBottom: 'none',
+						},
+					}}
+				>
+					<DataGrid
+						getRowId={(row) => row._id}
+						rows={allUsersReduxState.usersList || []}
+						columns={columns}
+						components={{ Toolbar: GridToolbar }}
+					/>
+				</Box>
 			)}
 		</>
 	)

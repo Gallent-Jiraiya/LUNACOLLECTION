@@ -21,6 +21,7 @@ import UserListScreen from './screens/UserListScreen'
 import UserEditScreen from './screens/UserEditScreen'
 import ProductListScreen from './screens/ProductListScreen'
 import AddProductScreen from './screens/AddProductScreen'
+import OrderListScreen from './screens/OrderListScreen'
 
 const App = () => {
 	const token = decodeURI(getCookie('token'))
@@ -35,6 +36,13 @@ const App = () => {
 				<main className='py-3'>
 					<Container>
 						<Routes>
+							<Route path='/' element={<HomeScreen />} />
+							<Route path='/search/:keyword' element={<HomeScreen />} />
+							<Route
+								path='/search/:keyword/page/:pageNumber'
+								element={<HomeScreen />}
+							/>
+							<Route path='/page/:pageNumber' element={<HomeScreen />} />
 							<Route path='/login' element={<LogInScreen />} />
 							<Route path='/register' element={<RegisterScreen />} />
 							<Route path='/profile' element={<ProfileScreen />} />
@@ -44,7 +52,6 @@ const App = () => {
 							<Route path='/placeorder' element={<PlaceOrderScreen />} />
 							<Route path='/cart/:id' element={<CartScreen />} />
 							<Route path='/orders/:id' element={<OrderScreen />} />
-							<Route path='/' element={<HomeScreen />} />
 							<Route path='/admin/userlist' element={<UserListScreen />} />
 							<Route path='/admin/user/:id/edit' element={<UserEditScreen />} />
 							<Route
@@ -53,6 +60,7 @@ const App = () => {
 							/>
 							<Route path='/admin/product/' element={<AddProductScreen />} />
 							<Route path='/admin/product/:id' element={<AddProductScreen />} />
+							<Route path='/admin/orderlist' element={<OrderListScreen />} />
 							{/* by putting ? after id makes it optional */}
 						</Routes>
 					</Container>

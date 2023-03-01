@@ -1,12 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit'
 import {
 	createOrder,
+	getAllOrders,
 	getMyOrders,
 	getOrderById,
-	payOrder,
+	getUserOrders,
+	setOrderDelivered,
+	setOrderShipped,
 } from './orderActions.js'
 
 const initialState = {
+	adminOrderList: null,
 	orderList: null,
 	order: null,
 	isError: false,
@@ -29,6 +33,7 @@ export const orderDataSlice = createSlice({
 		},
 		resetOrderData: (state) => {
 			state.orderList = null
+			state.adminOrderList = null
 			state.order = null
 			state.isError = false
 			state.isSuccess = false
@@ -83,28 +88,6 @@ export const orderDataSlice = createSlice({
 				state.message = action.payload
 				state.action = 'getOrderById'
 			})
-			.addCase(payOrder.pending, (state) => {
-				state.isLoading = true
-				state.isSuccess = false
-				state.isError = false
-				state.message = ''
-				state.action = 'payOrder'
-			})
-			.addCase(payOrder.fulfilled, (state, action) => {
-				state.isLoading = false
-				state.isSuccess = true
-				state.isError = false
-				state.message = ''
-				state.order = action.payload
-				state.action = 'payOrder'
-			})
-			.addCase(payOrder.rejected, (state, action) => {
-				state.isLoading = false
-				state.isSuccess = false
-				state.isError = true
-				state.message = action.payload
-				state.action = 'payOrder'
-			})
 			.addCase(getMyOrders.pending, (state) => {
 				state.isLoading = true
 				state.isSuccess = false
@@ -126,6 +109,94 @@ export const orderDataSlice = createSlice({
 				state.isError = true
 				state.message = action.payload
 				state.action = 'getMyOrders'
+			})
+			.addCase(getAllOrders.pending, (state) => {
+				state.isLoading = true
+				state.isSuccess = false
+				state.isError = false
+				state.message = ''
+				state.action = 'getAllOrders'
+			})
+			.addCase(getAllOrders.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = true
+				state.isError = false
+				state.message = ''
+				state.adminOrderList = action.payload
+				state.action = 'getAllOrders'
+			})
+			.addCase(getAllOrders.rejected, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = false
+				state.isError = true
+				state.message = action.payload
+				state.action = 'getAllOrders'
+			})
+			.addCase(setOrderShipped.pending, (state) => {
+				state.isLoading = true
+				state.isSuccess = false
+				state.isError = false
+				state.message = ''
+				state.action = 'setOrderShipped'
+			})
+			.addCase(setOrderShipped.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = true
+				state.isError = false
+				state.message = ''
+				state.order = action.payload
+				state.action = 'setOrderShipped'
+			})
+			.addCase(setOrderShipped.rejected, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = false
+				state.isError = true
+				state.message = action.payload
+				state.action = 'setOrderShipped'
+			})
+			.addCase(setOrderDelivered.pending, (state) => {
+				state.isLoading = true
+				state.isSuccess = false
+				state.isError = false
+				state.message = ''
+				state.action = 'setOrderDelivered'
+			})
+			.addCase(setOrderDelivered.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = true
+				state.isError = false
+				state.message = ''
+				state.order = action.payload
+				state.action = 'setOrderDelivered'
+			})
+			.addCase(setOrderDelivered.rejected, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = false
+				state.isError = true
+				state.message = action.payload
+				state.action = 'setOrderDelivered'
+			})
+			.addCase(getUserOrders.pending, (state) => {
+				state.isLoading = true
+				state.isSuccess = false
+				state.isError = false
+				state.message = ''
+				state.action = 'getUserOrders'
+			})
+			.addCase(getUserOrders.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = true
+				state.isError = false
+				state.message = ''
+				state.orderList = action.payload
+				state.action = 'getUserOrders'
+			})
+			.addCase(getUserOrders.rejected, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = false
+				state.isError = true
+				state.message = action.payload
+				state.action = 'getUserOrders'
 			})
 	},
 })

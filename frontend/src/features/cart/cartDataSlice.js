@@ -32,6 +32,7 @@ export const cartDataSlice = createSlice({
 			state.isSuccess = false
 			state.isLoading = false
 			state.message = ''
+			localStorage.removeItem('cartItems')
 		},
 		setPrices: (state, action) => {
 			state.itemsPrice = action.payload.itemsPrice

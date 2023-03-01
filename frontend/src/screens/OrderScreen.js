@@ -9,11 +9,16 @@ import {
 	Image,
 	ListGroupItem,
 	Card,
+	Button,
 } from 'react-bootstrap'
 
 import { Link } from 'react-router-dom'
 import { resetOrderStatus } from '../features/order/orderDataSlice'
-import { getOrderById } from '../features/order/orderActions'
+import {
+	getOrderById,
+	setOrderDelivered,
+	setOrderShipped,
+} from '../features/order/orderActions'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 
@@ -21,6 +26,7 @@ export const OrderScreen = () => {
 	const dispatch = useDispatch()
 	const { id: orderID } = useParams()
 	const [orderDetails, setOrderDetails] = useState()
+	const logedUser = useSelector((state) => state.logInDetails.userInfo)
 	const { order, isError, isSuccess, isLoading, message, action } = useSelector(
 		(state) => state.orders
 	)
@@ -33,14 +39,10 @@ export const OrderScreen = () => {
 	}
 
 	useEffect(() => {
-		if (
-			(orderID && !orderDetails) ||
-			(orderID && orderDetails && !(orderDetails._id === order._id))
-		) {
-			dispatch(getOrderById(orderID))
-		}
-	}, [action, dispatch, isError, isSuccess, order, orderDetails, orderID])
-	if (action === 'getOrderById' && isSuccess) {
+		dispatch(getOrderById(orderID))
+	}, [])
+
+	if (isSuccess) {
 		setOrderDetails(order)
 		dispatch(resetOrderStatus())
 	}
@@ -57,7 +59,7 @@ export const OrderScreen = () => {
 				<Col md={8}>
 					<ListGroup variant='flush'>
 						<ListGroup.Item>
-							<h2>Shipping</h2>
+							<h2>Delivery</h2>
 							<p>
 								<strong>Name:</strong>
 								{order.user.name}
@@ -73,17 +75,17 @@ export const OrderScreen = () => {
 							</p>
 							<p>
 								<strong>Order Shipped: </strong>
-								{order.isShipped ? (
+								{order.shipping.isShipped ? (
 									<Message variant='success'>
-										Delivered on {order.shippedAt}
+										Shipped on {order.shipping.shippedAt}
 									</Message>
 								) : (
 									<i className='fas fa-times' style={{ color: 'red' }}></i>
 								)}
 							</p>
-							{order.isDelivered ? (
+							{order.delivery.isDelivered ? (
 								<Message variant='success'>
-									Delivered on {order.deliveredAt}
+									Delivered on {order.delivery.deliveredAt}
 								</Message>
 							) : (
 								<Message variant='danger'>Not Delivered</Message>
@@ -124,7 +126,8 @@ export const OrderScreen = () => {
 													</Link>
 												</Col>
 												<Col md={4}>
-													{item.qty} x ${item.price} = ${item.price * item.qty}
+													{item.qty} x RS.{item.price} = RS.
+													{item.price * item.qty}
 												</Col>
 											</Row>
 										</ListGroupItem>
@@ -143,21 +146,52 @@ export const OrderScreen = () => {
 							<ListGroupItem>
 								<Row>
 									<Col>Items</Col>
-									<Col>${itemsPrice}</Col>
+									<Col>RS.{itemsPrice}</Col>
 								</Row>
 							</ListGroupItem>
 							<ListGroupItem>
 								<Row>
 									<Col>Shipping</Col>
-									<Col>${order.shippingPrice}</Col>
+									<Col>RS.{order.shippingPrice}</Col>
 								</Row>
 							</ListGroupItem>
 							<ListGroupItem>
 								<Row>
 									<Col>Total</Col>
-									<Col>${order.totalPrice}</Col>
+									<Col>RS.{order.totalPrice}</Col>
 								</Row>
 							</ListGroupItem>
+							<ListGroupItem>
+								<Row>
+									<Button variant='primary'>DOWNLOAD INVOICE</Button>
+								</Row>
+							</ListGroupItem>
+							{logedUser.isAdmin && !order.shipping.isShipped && (
+								<ListGroupItem>
+									<Row>
+										<Button
+											onClick={() => dispatch(setOrderShipped(order._id))}
+											variant='primary'
+										>
+											Set as Shipped
+										</Button>
+									</Row>
+								</ListGroupItem>
+							)}
+							{!logedUser.isAdmin &&
+								order.shipping.isShipped &&
+								!order.delivery.isDelivered && (
+									<ListGroupItem>
+										<Row>
+											<Button
+												onClick={() => dispatch(setOrderDelivered(order._id))}
+												variant='primary'
+											>
+												Set as Delivered
+											</Button>
+										</Row>
+									</ListGroupItem>
+								)}
 						</ListGroup>
 					</Card>
 				</Col>

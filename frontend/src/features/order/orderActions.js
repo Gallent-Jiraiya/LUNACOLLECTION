@@ -38,12 +38,13 @@ export const getOrderById = createAsyncThunk(
 		}
 	}
 )
-//pay order by id
-export const payOrder = createAsyncThunk(
-	'order/pay',
-	async (orderID, paymentResult, thunkAPI) => {
+
+//get Logged in users all orders
+export const getMyOrders = createAsyncThunk(
+	'order/myOrders',
+	async (_, thunkAPI) => {
 		try {
-			return await orderDataService.payOrder(orderID, paymentResult)
+			return await orderDataService.getMyOrders()
 		} catch (error) {
 			const message =
 				(error.response &&
@@ -55,12 +56,62 @@ export const payOrder = createAsyncThunk(
 		}
 	}
 )
-//get Logged in users all orders
-export const getMyOrders = createAsyncThunk(
-	'order/myOrders',
+//get all orders for admin
+export const getAllOrders = createAsyncThunk(
+	'order/all',
 	async (_, thunkAPI) => {
 		try {
-			return await orderDataService.getMyOrders()
+			return await orderDataService.getAllOrders()
+		} catch (error) {
+			const message =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString()
+			return thunkAPI.rejectWithValue(message)
+		}
+	}
+)
+//set orders shipped by admin
+export const setOrderShipped = createAsyncThunk(
+	'order/shipped',
+	async (id, thunkAPI) => {
+		try {
+			return await orderDataService.setOrderShipped(id)
+		} catch (error) {
+			const message =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString()
+			return thunkAPI.rejectWithValue(message)
+		}
+	}
+)
+//set orders shipped by User
+export const setOrderDelivered = createAsyncThunk(
+	'order/delivered',
+	async (id, thunkAPI) => {
+		try {
+			return await orderDataService.setOrderDelivered(id)
+		} catch (error) {
+			const message =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString()
+			return thunkAPI.rejectWithValue(message)
+		}
+	}
+)
+export const getUserOrders = createAsyncThunk(
+	'order/users',
+	async (id, thunkAPI) => {
+		try {
+			return await orderDataService.getUserOrders(id)
 		} catch (error) {
 			const message =
 				(error.response &&

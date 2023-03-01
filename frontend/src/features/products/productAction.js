@@ -4,9 +4,26 @@ import productService from './productService'
 //getProducts
 export const listProducts = createAsyncThunk(
 	'products/getAll',
+	async (object = { keyword: '', pageNumber: '' }, thunkAPI) => {
+		try {
+			return await productService.getProducts(object)
+		} catch (error) {
+			const message =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString()
+			return thunkAPI.rejectWithValue(message)
+		}
+	}
+)
+//getAllProducts
+export const getAllProducts = createAsyncThunk(
+	'products/getAllProducts',
 	async (_, thunkAPI) => {
 		try {
-			return await productService.getProducts()
+			return await productService.getProductsAll()
 		} catch (error) {
 			const message =
 				(error.response &&

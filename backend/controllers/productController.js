@@ -7,7 +7,29 @@ import { s3 } from '../server.js'
 //@route Get/api/products
 //@access public
 const getProducts = asyncHandler(async (req, res) => {
-	const products = await Product.find({}).populate('category')
+	const pageSize = 6
+	const page = Number(req.query.pageNumber) || 1
+	const keyword = req.query.keyword
+		? { name: { $regex: req.query.keyword, $options: 'i' } }
+		: {}
+	const count = await Product.count({ ...keyword })
+	const products = await Product.find({ ...keyword })
+		.populate({
+			path: 'category',
+			select: 'name',
+		})
+		.limit(pageSize)
+		.skip(pageSize * (page - 1))
+	res.json({ products, page, pages: Math.ceil(count / pageSize) })
+})
+//@desc Fetch all products
+//@route Get/api/productsall
+//@access private/Admin
+const getProductsAll = asyncHandler(async (req, res) => {
+	const products = await Product.find().populate({
+		path: 'category',
+		select: 'name',
+	})
 	res.json(products)
 })
 
@@ -26,7 +48,7 @@ const getProductById = asyncHandler(async (req, res) => {
 })
 //@desc delete product
 //@route Delete/api/products/:id
-//@access public/Admin
+//@access private/Admin
 const deleteProductById = asyncHandler(async (req, res) => {
 	const product = await Product.findOne({ _id: req.params.id })
 	const deleteParams = {
@@ -51,7 +73,7 @@ const deleteProductById = asyncHandler(async (req, res) => {
 })
 //@desc Update product
 //@route PUT/api/products/:id
-//@access public/Admin
+//@access private/Admin
 const updateProductById = asyncHandler(async (req, res) => {
 	const product = await Product.findOne({ _id: req.params.id })
 	if (req.file) {
@@ -112,11 +134,11 @@ const updateProductById = asyncHandler(async (req, res) => {
 			}
 		)
 	}
-	
 })
+
 //@desc create product
-//@route Delete/api/products/:id
-//@access public/Admin
+//@route PUT/api/products/:id
+//@access private/Admin
 const createProduct = asyncHandler(async (req, res) => {
 	const newProduct = new Product({
 		user: req.user._id,
@@ -162,10 +184,28 @@ const createProduct = asyncHandler(async (req, res) => {
 		}
 	})
 })
+//@desc Get all the products ordered by user
+//@route GET/api/products/ordered/
+//@access Private
+const getProductsOrdered = asyncHandler(async (req, res) => {
+	const productIds = await Order.distinct('orderItems.product', {
+		user: req.user._id,
+		completed: true,
+	})
+	if (productIds) {
+		res.json(productIds)
+	} else {
+		res.status(401)
+		throw new Error('products not found')
+	}
+})
+
 export {
 	getProducts,
 	getProductById,
 	deleteProductById,
 	updateProductById,
 	createProduct,
+	getProductsAll,
+	getProductsOrdered,
 }

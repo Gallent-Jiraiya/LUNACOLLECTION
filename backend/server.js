@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import colors from 'colors'
 import AWS from 'aws-sdk'
 import cors from 'cors'
+import morgan from 'morgan'
 import { notFound, errorHandler } from './middleware/errorMiddleware.js'
 import connectDB from './config/db.js'
 
@@ -11,7 +12,7 @@ import userRoutes from './routes/userRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
 import cartRoutes from './routes/cartRoutes.js'
 import categoryRoutes from './routes/categoryRoutes.js'
-import md5 from 'md5'
+import reviewRoutes from './routes/reviewRoutes.js'
 
 //this connects env file with the config file
 dotenv.config()
@@ -27,6 +28,9 @@ export const s3 = new AWS.S3({
 	region: region,
 })
 const app = express()
+if (process.env.NODE_ENV === 'development') {
+	app.use(morgan('dev'))
+}
 
 app.use(cors())
 app.use(express.json())
@@ -44,6 +48,7 @@ app.use('/api/orders', orderRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/cart', cartRoutes)
 app.use('/api/categories', categoryRoutes)
+app.use('/api/reviews', reviewRoutes)
 
 app.get('/api/config/paypal', (req, res) => {
 	res.json(process.env.PAYPAL_CLIENT_ID)

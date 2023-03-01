@@ -156,6 +156,7 @@ const getUserByID = asyncHandler(async (req, res) => {
 		throw new Error('User not found')
 	}
 })
+
 //@desc Update user profile
 //@route PUT/api/users/:id
 //@access Private/Admin
