@@ -40,7 +40,7 @@ const Header = () => {
 									<i className='fas fa-house'></i>Home
 								</Nav.Link>
 							</LinkContainer>
-							<LinkContainer to='/'>
+							<LinkContainer to='/shop'>
 								<Nav.Link>
 									<i className='fas fa-shop'></i>Shop
 								</Nav.Link>

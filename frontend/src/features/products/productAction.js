@@ -4,9 +4,46 @@ import productService from './productService'
 //getProducts
 export const listProducts = createAsyncThunk(
 	'products/getAll',
-	async (object = { keyword: '', pageNumber: '' }, thunkAPI) => {
+	async (
+		object = { keyword: '', pageNumber: '', category: '', price: '' },
+		thunkAPI
+	) => {
 		try {
 			return await productService.getProducts(object)
+		} catch (error) {
+			const message =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString()
+			return thunkAPI.rejectWithValue(message)
+		}
+	}
+)
+//getLatestProducts
+export const latestProducts = createAsyncThunk(
+	'products/getLatest',
+	async (_, thunkAPI) => {
+		try {
+			return await productService.getLatestProducts()
+		} catch (error) {
+			const message =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString()
+			return thunkAPI.rejectWithValue(message)
+		}
+	}
+)
+//getTrendingProducts
+export const trendingProducts = createAsyncThunk(
+	'products/getTrending',
+	async (_, thunkAPI) => {
+		try {
+			return await productService.getTrendingProducts()
 		} catch (error) {
 			const message =
 				(error.response &&

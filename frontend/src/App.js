@@ -22,6 +22,7 @@ import UserEditScreen from './screens/UserEditScreen'
 import ProductListScreen from './screens/ProductListScreen'
 import AddProductScreen from './screens/AddProductScreen'
 import OrderListScreen from './screens/OrderListScreen'
+import Landing from './screens/Landing'
 
 const App = () => {
 	const token = decodeURI(getCookie('token'))
@@ -33,16 +34,29 @@ const App = () => {
 		<>
 			<Router>
 				<Header />
-				<main className='py-3'>
+				<main>
+					<Routes>
+						<Route path='/' element={<Landing />} />
+					</Routes>
 					<Container>
 						<Routes>
-							<Route path='/' element={<HomeScreen />} />
-							<Route path='/search/:keyword' element={<HomeScreen />} />
+							<Route path='/shop' element={<HomeScreen />} />
 							<Route
-								path='/search/:keyword/page/:pageNumber'
+								path='/shop/search/:keyword/page/:pageNumber'
+								element={<HomeScreen />}
+							/>
+							<Route path='/shop/search/:keyword' element={<HomeScreen />} />
+							<Route
+								path='/shop/search/:keyword/page/:pageNumber/category/:category/price/:price'
 								element={<HomeScreen />}
 							/>
 							<Route path='/page/:pageNumber' element={<HomeScreen />} />
+							<Route path='/shop/price/:price' element={<HomeScreen />} />
+							<Route
+								path='/shop/category/:category/page/:pageNumber'
+								element={<HomeScreen />}
+							/>
+							<Route path='/shop/category/:category' element={<HomeScreen />} />
 							<Route path='/login' element={<LogInScreen />} />
 							<Route path='/register' element={<RegisterScreen />} />
 							<Route path='/profile' element={<ProfileScreen />} />

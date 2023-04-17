@@ -5,10 +5,12 @@ const router = express.Router()
 import {
 	createProduct,
 	deleteProductById,
+	getLatestProducts,
 	getProductById,
 	getProducts,
 	getProductsAll,
 	getProductsOrdered,
+	getTrendingProducts,
 	updateProductById,
 } from '../controllers/productController.js'
 import { admin, protect } from '../middleware/authMiddleware.js'
@@ -23,7 +25,8 @@ const uploadImage = multer({
 		}
 	},
 }).single('image')
-
+router.route('/latestproducts').get(getLatestProducts)
+router.route('/trending').get(getTrendingProducts)
 router
 	.route('/')
 	.get(getProducts)

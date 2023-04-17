@@ -10,7 +10,12 @@ const listProduct = async (id) => {
 }
 
 //retrieve products
-const getProducts = async ({ keyword = '', pageNumber = '' }) => {
+const getProducts = async ({
+	keyword = '',
+	pageNumber = '',
+	category = '',
+	price = '',
+}) => {
 	const token = decodeURI(getCookie('token'))
 	const config = {
 		headers: {
@@ -19,7 +24,7 @@ const getProducts = async ({ keyword = '', pageNumber = '' }) => {
 		},
 	}
 	const response = await axios.get(
-		`/api/products?keyword=${keyword}&pageNumber=${pageNumber}`,
+		`/api/products?keyword=${keyword}&pageNumber=${pageNumber}&category=${category}&price=${price}`,
 		config
 	)
 	return response.data
@@ -34,6 +39,30 @@ const getProductsAll = async () => {
 		},
 	}
 	const response = await axios.get(`/api/products/all`, config)
+	return response.data
+}
+//retrieve latest products
+const getLatestProducts = async () => {
+	const token = decodeURI(getCookie('token'))
+	const config = {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`,
+		},
+	}
+	const response = await axios.get(`/api/products/latestproducts`, config)
+	return response.data
+}
+//retrieve trending products
+const getTrendingProducts = async () => {
+	const token = decodeURI(getCookie('token'))
+	const config = {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`,
+		},
+	}
+	const response = await axios.get(`/api/products/trending`, config)
 	return response.data
 }
 //delete product
@@ -77,6 +106,8 @@ const productService = {
 	deleteProduct,
 	updateProduct,
 	addProduct,
+	getLatestProducts,
 	getProductsAll,
+	getTrendingProducts,
 }
 export default productService

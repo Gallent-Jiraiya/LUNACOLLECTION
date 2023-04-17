@@ -1,8 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { deleteProduct, getAllProducts, listProducts } from './productAction'
+import {
+	deleteProduct,
+	getAllProducts,
+	latestProducts,
+	listProducts,
+	trendingProducts,
+} from './productAction'
 
 const initialState = {
 	products: null,
+	trending: [],
+	latest: [],
 	isError: false,
 	isSuccess: false,
 	isLoading: false,
@@ -16,6 +24,9 @@ export const productListDataSlice = createSlice({
 	reducers: {
 		resetProductList: (state) => {
 			state.products = null
+			state.allProducts = null
+			state.latest = []
+			state.trending = []
 			state.isLoading = false
 			state.isError = false
 			state.isSuccess = false
@@ -63,7 +74,7 @@ export const productListDataSlice = createSlice({
 				state.isLoading = false
 				state.isSuccess = true
 				state.isError = false
-				state.products = action.payload
+				state.allProducts = action.payload
 				state.action = 'getAllProducts'
 			})
 			.addCase(getAllProducts.rejected, (state, action) => {
@@ -72,7 +83,46 @@ export const productListDataSlice = createSlice({
 				state.isError = true
 				state.message = action.payload
 				state.action = 'getAllProducts'
-				//state.products=[]
+			})
+			.addCase(latestProducts.pending, (state) => {
+				state.isLoading = true
+				state.isError = false
+				state.isSuccess = false
+				state.action = 'latestProducts'
+			})
+			.addCase(latestProducts.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = true
+				state.isError = false
+				state.latest = action.payload
+				state.action = 'latestProducts'
+			})
+			.addCase(latestProducts.rejected, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = false
+				state.isError = true
+				state.message = action.payload
+				state.action = 'latestProducts'
+			})
+			.addCase(trendingProducts.pending, (state) => {
+				state.isLoading = true
+				state.isError = false
+				state.isSuccess = false
+				state.action = 'trendingProducts'
+			})
+			.addCase(trendingProducts.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = true
+				state.isError = false
+				state.trending = action.payload
+				state.action = 'trendingProducts'
+			})
+			.addCase(trendingProducts.rejected, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = false
+				state.isError = true
+				state.message = action.payload
+				state.action = 'trendingProducts'
 			})
 			.addCase(deleteProduct.pending, (state) => {
 				state.isLoading = true

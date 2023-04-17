@@ -134,7 +134,7 @@ const ProductListScreen = () => {
 				>
 					<DataGrid
 						getRowId={(row) => row._id}
-						rows={allProductsReduxState.products || []}
+						rows={allProductsReduxState.allProducts || []}
 						columns={columns}
 						components={{ Toolbar: GridToolbar }}
 					/>

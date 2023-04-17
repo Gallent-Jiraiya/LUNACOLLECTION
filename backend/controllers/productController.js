@@ -2,15 +2,25 @@ import asyncHandler from 'express-async-handler'
 import Product from '../models/productModel.js'
 import path from 'path'
 import { s3 } from '../server.js'
+import Category from '../models/categoriesModel.js'
+import { AsyncResource } from 'async_hooks'
 
 //@desc Fetch all products
 //@route Get/api/products
 //@access public
 const getProducts = asyncHandler(async (req, res) => {
-	const pageSize = 6
+	const pageSize = 4
 	const page = Number(req.query.pageNumber) || 1
+	const category = req.query.category
+		? await Category.findOne({
+				name: { $regex: req.query.category, $options: 'i' },
+		  })
+		: ''
+	console.log(category._id)
 	const keyword = req.query.keyword
 		? { name: { $regex: req.query.keyword, $options: 'i' } }
+		: req.query.category
+		? { category: String(category._id) }
 		: {}
 	const count = await Product.count({ ...keyword })
 	const products = await Product.find({ ...keyword })
@@ -22,6 +32,28 @@ const getProducts = asyncHandler(async (req, res) => {
 		.skip(pageSize * (page - 1))
 	res.json({ products, page, pages: Math.ceil(count / pageSize) })
 })
+//@desc fetch latest Products
+//@route Get/api/latestproducts
+//@access public
+const getLatestProducts = asyncHandler(async (req, res) => {
+	const products = await Product.find()
+		.populate({ path: 'category', selectt: 'name' })
+		.sort({ createdAt: -1 })
+		.limit(8)
+	res.json(products)
+})
+
+//@desc fetch tending Products
+//@route Get/api/latestproducts
+//@access public
+const getTrendingProducts = asyncHandler(async (req, res) => {
+	const products = await Product.find()
+		.populate({ path: 'category', selectt: 'name' })
+		.sort({ rating: -1 })
+		.limit(4)
+	res.json(products)
+})
+
 //@desc Fetch all products
 //@route Get/api/productsall
 //@access private/Admin
@@ -202,10 +234,12 @@ const getProductsOrdered = asyncHandler(async (req, res) => {
 
 export {
 	getProducts,
+	getLatestProducts,
 	getProductById,
 	deleteProductById,
 	updateProductById,
 	createProduct,
+	getTrendingProducts,
 	getProductsAll,
 	getProductsOrdered,
 }

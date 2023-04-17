@@ -58,7 +58,7 @@ const ProductScreen = () => {
 								</ListGroup.Item>
 								<ListGroup.Item>Price:Rs.{product.price}</ListGroup.Item>
 								<ListGroup.Item>
-									Description:{product.description}
+									Description:{product.shortDescription}
 								</ListGroup.Item>
 							</ListGroup>
 						</Col>
