@@ -16,20 +16,47 @@ const getProducts = asyncHandler(async (req, res) => {
 				name: { $regex: req.query.category, $options: 'i' },
 		  })
 		: ''
-	console.log(category._id)
-	const keyword = req.query.keyword
-		? { name: { $regex: req.query.keyword, $options: 'i' } }
-		: req.query.category
-		? { category: String(category._id) }
-		: {}
-	const count = await Product.count({ ...keyword })
-	const products = await Product.find({ ...keyword })
+	const filter =
+		req.query.keyword && req.query.category
+			? {
+					name: { $regex: req.query.keyword, $options: 'i' },
+					category: String(category._id),
+					price: {
+						$gte: parseInt(req.query.range1),
+						$lt: parseInt(req.query.range2),
+					},
+			  }
+			: req.query.category
+			? {
+					category: String(category._id),
+					price: {
+						$gte: parseInt(req.query.range1),
+						$lt: parseInt(req.query.range2),
+					},
+			  }
+			: req.query.keyword
+			? {
+					name: { $regex: req.query.keyword, $options: 'i' },
+					price: {
+						$gte: parseInt(req.query.range1),
+						$lt: parseInt(req.query.range2),
+					},
+			  }
+			: {
+					price: {
+						$gte: parseInt(req.query.range1),
+						$lt: parseInt(req.query.range2),
+					},
+			  }
+	const count = await Product.count({ ...filter })
+	const products = await Product.find({ ...filter })
 		.populate({
 			path: 'category',
 			select: 'name',
 		})
 		.limit(pageSize)
 		.skip(pageSize * (page - 1))
+	console.log(filter)
 	res.json({ products, page, pages: Math.ceil(count / pageSize) })
 })
 //@desc fetch latest Products

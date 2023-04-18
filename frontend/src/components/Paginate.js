@@ -17,18 +17,10 @@ const Paginate = ({
 					<LinkContainer
 						key={x + 1}
 						to={
-							keyword && category && price
-								? `/shop/search/${keyword}/page/${
-										x + 1
-								  }/category/${category}/price/${price}`
-								: keyword && category
-								? `/shop/search/${keyword}/page/${x + 1}/category/${category}`
-								: keyword && price
-								? `/shop/search/${keyword}/page/${x + 1}/price/${price}`
+							keyword && category
+								? `/shop/search/${keyword}/category/${category}/page/${x + 1}`
 								: keyword
 								? `/shop/search/${keyword}/page/${x + 1}`
-								: price
-								? `/shop/price/${price}/page/${x + 1}`
 								: category
 								? `/shop/category/${category}/page/${x + 1}`
 								: `/shop/page/${x + 1}`

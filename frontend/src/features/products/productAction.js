@@ -4,10 +4,7 @@ import productService from './productService'
 //getProducts
 export const listProducts = createAsyncThunk(
 	'products/getAll',
-	async (
-		object = { keyword: '', pageNumber: '', category: '', price: '' },
-		thunkAPI
-	) => {
+	async (object, thunkAPI) => {
 		try {
 			return await productService.getProducts(object)
 		} catch (error) {

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import jsPDF from 'jspdf'
 import {
 	Col,
 	Row,
@@ -37,7 +38,16 @@ export const OrderScreen = () => {
 			0
 		)
 	}
-
+	const handleDownload = () => {
+		window.print()
+		// const pdf = new jsPDF()
+		// pdf.html(document.getElementsByClassName('container')[1], {
+		// 	callback: function () {
+		// 		pdf.save('my-document.pdf')
+		// 	},
+		// 	format: 'a4',
+		// })
+	}
 	useEffect(() => {
 		dispatch(getOrderById(orderID))
 	}, [])
@@ -161,9 +171,11 @@ export const OrderScreen = () => {
 									<Col>RS.{order.totalPrice}</Col>
 								</Row>
 							</ListGroupItem>
-							<ListGroupItem>
+							<ListGroupItem className='printbtn'>
 								<Row>
-									<Button variant='primary'>DOWNLOAD INVOICE</Button>
+									<Button variant='primary' onClick={handleDownload}>
+										DOWNLOAD INVOICE
+									</Button>
 								</Row>
 							</ListGroupItem>
 							{logedUser.isAdmin && !order.shipping.isShipped && (

@@ -14,7 +14,7 @@ const getProducts = async ({
 	keyword = '',
 	pageNumber = '',
 	category = '',
-	price = '',
+	range = [0, 100000],
 }) => {
 	const token = decodeURI(getCookie('token'))
 	const config = {
@@ -24,7 +24,7 @@ const getProducts = async ({
 		},
 	}
 	const response = await axios.get(
-		`/api/products?keyword=${keyword}&pageNumber=${pageNumber}&category=${category}&price=${price}`,
+		`/api/products?keyword=${keyword}&pageNumber=${pageNumber}&category=${category}&range1=${range[0]}&range2=${range[1]}`,
 		config
 	)
 	return response.data

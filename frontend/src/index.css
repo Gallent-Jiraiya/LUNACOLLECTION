@@ -18,3 +18,14 @@ h2 {
 .rating span {
 	margin: 0.1rem;
 }
+@media print {
+	/* Hide everything except the element with the class "printable" */
+	footer,
+	header,
+	.printbtn {
+		display: none;
+	}
+	.printable {
+		display: block;
+	}
+}

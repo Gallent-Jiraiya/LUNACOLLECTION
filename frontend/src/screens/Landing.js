@@ -183,6 +183,7 @@ const Landing = () => {
 								<Image
 									style={{ width: '400px' }}
 									src='/images/instagram1.png'
+									alt='Instagram Post'
 								/>
 							</a>
 						</Col>
@@ -194,6 +195,7 @@ const Landing = () => {
 								<Image
 									style={{ width: '400px', height: '500px' }}
 									src='/images/instagram2.png'
+									alt='Instagram Post'
 								/>
 							</a>
 						</Col>
@@ -205,6 +207,7 @@ const Landing = () => {
 								<Image
 									style={{ width: '400px' }}
 									src='/images/instagram3.png'
+									alt='Instagram Post'
 								/>
 							</a>
 						</Col>

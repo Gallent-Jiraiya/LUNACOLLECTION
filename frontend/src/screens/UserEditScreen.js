@@ -251,6 +251,14 @@ function UserEditScreen() {
 										type='text'
 										placeholder='Enter name'
 										value={name}
+										disabled={
+											logInReduxUserInfo && usersReduxState.userInfo
+												? logInReduxUserInfo.isAdmin &&
+												  usersReduxState &&
+												  logInReduxUserInfo._id !==
+														usersReduxState.userInfo._id
+												: true
+										}
 										onChange={(e) => setName(e.target.value)}
 									></Form.Control>
 								</Form.Group>
@@ -260,6 +268,14 @@ function UserEditScreen() {
 										type='email'
 										placeholder='Enter email'
 										value={email}
+										disabled={
+											logInReduxUserInfo && usersReduxState.userInfo
+												? logInReduxUserInfo.isAdmin &&
+												  usersReduxState &&
+												  logInReduxUserInfo._id !==
+														usersReduxState.userInfo._id
+												: true
+										}
 										onChange={(e) => setEmail(e.target.value)}
 									></Form.Control>
 								</Form.Group>

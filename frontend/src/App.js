@@ -23,6 +23,7 @@ import ProductListScreen from './screens/ProductListScreen'
 import AddProductScreen from './screens/AddProductScreen'
 import OrderListScreen from './screens/OrderListScreen'
 import Landing from './screens/Landing'
+import OverviewScreen from './screens/OverviewScreen'
 
 const App = () => {
 	const token = decodeURI(getCookie('token'))
@@ -30,6 +31,7 @@ const App = () => {
 	if (!token) {
 		dispatch(logout())
 	}
+
 	return (
 		<>
 			<Router>
@@ -38,7 +40,7 @@ const App = () => {
 					<Routes>
 						<Route path='/' element={<Landing />} />
 					</Routes>
-					<Container>
+					<Container className='printable'>
 						<Routes>
 							<Route path='/shop' element={<HomeScreen />} />
 							<Route
@@ -47,11 +49,14 @@ const App = () => {
 							/>
 							<Route path='/shop/search/:keyword' element={<HomeScreen />} />
 							<Route
-								path='/shop/search/:keyword/page/:pageNumber/category/:category/price/:price'
+								path='/shop/search/:keyword/category/:category'
 								element={<HomeScreen />}
 							/>
-							<Route path='/page/:pageNumber' element={<HomeScreen />} />
-							<Route path='/shop/price/:price' element={<HomeScreen />} />
+							<Route
+								path='/shop/search/:keyword/category/:category/page/:pageNumber'
+								element={<HomeScreen />}
+							/>
+							<Route path='/shop/page/:pageNumber' element={<HomeScreen />} />
 							<Route
 								path='/shop/category/:category/page/:pageNumber'
 								element={<HomeScreen />}
@@ -66,6 +71,7 @@ const App = () => {
 							<Route path='/placeorder' element={<PlaceOrderScreen />} />
 							<Route path='/cart/:id' element={<CartScreen />} />
 							<Route path='/orders/:id' element={<OrderScreen />} />
+							<Route path='/admin/overview' element={<OverviewScreen />} />
 							<Route path='/admin/userlist' element={<UserListScreen />} />
 							<Route path='/admin/user/:id/edit' element={<UserEditScreen />} />
 							<Route
