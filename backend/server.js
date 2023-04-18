@@ -13,6 +13,7 @@ import orderRoutes from './routes/orderRoutes.js'
 import cartRoutes from './routes/cartRoutes.js'
 import categoryRoutes from './routes/categoryRoutes.js'
 import reviewRoutes from './routes/reviewRoutes.js'
+import overviewRoutes from './routes/overviewRoutes.js'
 
 //this connects env file with the config file
 dotenv.config()
@@ -44,6 +45,7 @@ app.use('/api/products', productRoutes)
 
 //this redirects any url with /api/users to route in userRoutes
 app.use('/api/users', userRoutes)
+app.use('/api/overview', overviewRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/cart', cartRoutes)

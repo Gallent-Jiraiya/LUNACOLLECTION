@@ -60,6 +60,9 @@ const ProductScreen = () => {
 								<ListGroup.Item>
 									Description:{product.shortDescription}
 								</ListGroup.Item>
+								<ListGroup.Item>
+									Long Description:{product.description}
+								</ListGroup.Item>
 							</ListGroup>
 						</Col>
 						<Col md={3}>
