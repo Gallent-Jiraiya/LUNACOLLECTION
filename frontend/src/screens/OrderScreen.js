@@ -11,6 +11,7 @@ import {
 	ListGroupItem,
 	Card,
 	Button,
+	Form,
 } from 'react-bootstrap'
 
 import { Link } from 'react-router-dom'
@@ -22,10 +23,18 @@ import {
 } from '../features/order/orderActions'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
+import { Modal } from 'antd'
+import { reviewProductByOrder } from '../features/reviews/reviewsAction'
+import { resetReviewStatus } from '../features/reviews/reviewDataSlice'
 
 export const OrderScreen = () => {
 	const dispatch = useDispatch()
 	const { id: orderID } = useParams()
+	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [rating, setRating] = useState('')
+	const [comment, setComment] = useState('')
+	const [productID, setProductID] = useState()
+	const reviewsReduxState = useSelector((state) => state.reviews)
 	const [orderDetails, setOrderDetails] = useState()
 	const logedUser = useSelector((state) => state.logInDetails.userInfo)
 	const { order, isError, isSuccess, isLoading, message, action } = useSelector(
@@ -37,6 +46,43 @@ export const OrderScreen = () => {
 			(acc, item) => acc + item.price * item.qty,
 			0
 		)
+	}
+	if (
+		reviewsReduxState.action === 'reviewProductByOrder' &&
+		reviewsReduxState.isSuccess
+	) {
+		toast.success(reviewsReduxState.message)
+		dispatch(resetReviewStatus())
+		dispatch(getOrderById(orderID))
+		setRating('')
+		setComment('')
+	}
+	if (
+		reviewsReduxState.action === 'reviewProduct' &&
+		reviewsReduxState.isError
+	) {
+		toast.error(reviewsReduxState.message)
+		dispatch(resetReviewStatus())
+	}
+	const showModal = (id) => {
+		setIsModalOpen(true)
+		setProductID(id)
+	}
+	const handleOk = () => {
+		if (rating !== '' && comment !== '') {
+			setIsModalOpen(false)
+			const object = {
+				orderId: orderID,
+				id: productID,
+				object: { rating: rating, comment: comment },
+			}
+			dispatch(reviewProductByOrder(object))
+		} else {
+			toast.error('fields must be filled')
+		}
+	}
+	const handleCancel = () => {
+		setIsModalOpen(false)
 	}
 	const handleDownload = () => {
 		window.print()
@@ -139,6 +185,15 @@ export const OrderScreen = () => {
 													{item.qty} x RS.{item.price} = RS.
 													{item.price * item.qty}
 												</Col>
+												<Col md={2}>
+													{order.delivery.isDelivered && !item.reviewed ? (
+														<Button onClick={() => showModal(item.product)}>
+															Review
+														</Button>
+													) : (
+														<></>
+													)}
+												</Col>
 											</Row>
 										</ListGroupItem>
 									))}
@@ -208,6 +263,62 @@ export const OrderScreen = () => {
 					</Card>
 				</Col>
 			</Row>
+			<Modal
+				title='Add review'
+				open={isModalOpen}
+				onOk={handleOk}
+				onCancel={handleCancel}
+				footer={[
+					<>
+						<Button key={'submit'} onClick={handleOk}>
+							SUBMIT
+						</Button>
+						{'  '}
+						<Button key={'back'} onClick={handleCancel}>
+							CANCEL
+						</Button>
+					</>,
+				]}
+			>
+				<Form>
+					<Form.Group controlId='rating'>
+						<Form.Label>Rating</Form.Label>
+						<Form.Control
+							as='select'
+							value={rating}
+							onChange={(e) => setRating(e.target.value)}
+						>
+							<option key={1} value=''>
+								Select...
+							</option>
+							<option key={2} value='1'>
+								1 - Poor
+							</option>
+							<option key={3} value='2'>
+								2 - Fair
+							</option>
+							<option key={4} value='3'>
+								3 - Good
+							</option>
+							<option key={5} value='4'>
+								4 - Very Good
+							</option>
+							<option key={6} value='5'>
+								5 - Excellent
+							</option>
+						</Form.Control>
+					</Form.Group>
+					<Form.Group controlId={'comment'}>
+						<Form.Label>Comment</Form.Label>
+						<Form.Control
+							as='textarea'
+							row='3'
+							value={comment}
+							onChange={(e) => setComment(e.target.value)}
+						></Form.Control>
+					</Form.Group>
+				</Form>
+			</Modal>
 		</>
 	)
 }

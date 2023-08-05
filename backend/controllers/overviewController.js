@@ -12,8 +12,7 @@ export const getMonthlyOrders = asyncHandler(async (req, res) => {
 		const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), 1) // Subtract one year from the current date
 		const productCount = await Product.count()
 		const userCount = await User.count()
-		let UserRegCount
-		User.aggregate([
+		const UserRegCount = await User.aggregate([
 			{ $match: { createdAt: { $gte: oneYearAgo } } }, // filter users created in the past year
 			{
 				$group: {
@@ -33,15 +32,9 @@ export const getMonthlyOrders = asyncHandler(async (req, res) => {
 					month: 1, // sort the results by month in ascending order
 				},
 			},
-		]).exec((err, result) => {
-			if (err) {
-				console.log(err)
-			} else {
-				UserRegCount = result
-			}
-		})
+		])
 		const orders = await Order.find({ createdAt: { $gte: oneYearAgo } })
-
+		console.log(UserRegCount)
 		const monthlyCount = {}
 		let orderCount = 0
 		orders.forEach((order) => {

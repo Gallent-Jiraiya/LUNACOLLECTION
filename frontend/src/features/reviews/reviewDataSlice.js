@@ -4,6 +4,7 @@ import {
 	getNeedReviewProducts,
 	reviewedProduct,
 	reviewProduct,
+	reviewProductByOrder,
 } from './reviewsAction.js'
 
 const initialState = {
@@ -81,6 +82,27 @@ export const reviewDataSlice = createSlice({
 				state.isError = true
 				state.message = action.payload
 				state.action = 'reviewProduct'
+			})
+			.addCase(reviewProductByOrder.pending, (state) => {
+				state.isLoading = true
+				state.isSuccess = false
+				state.isError = false
+				state.message = ''
+				state.action = 'reviewProductByOrder'
+			})
+			.addCase(reviewProductByOrder.fulfilled, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = true
+				state.isError = false
+				state.message = action.payload
+				state.action = 'reviewProductByOrder'
+			})
+			.addCase(reviewProductByOrder.rejected, (state, action) => {
+				state.isLoading = false
+				state.isSuccess = false
+				state.isError = true
+				state.message = action.payload
+				state.action = 'reviewProductByOrder'
 			})
 			.addCase(reviewedProduct.pending, (state) => {
 				state.isLoading = true

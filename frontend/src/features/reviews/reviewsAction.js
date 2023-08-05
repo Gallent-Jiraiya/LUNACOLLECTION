@@ -40,6 +40,30 @@ export const reviewProduct = createAsyncThunk(
 		}
 	}
 )
+//review product by order
+export const reviewProductByOrder = createAsyncThunk(
+	'reviewByOrder',
+	async ({ orderId, id, object }, thunkAPI) => {
+		try {
+			console.log(id)
+			console.log(object)
+			const response = await reviewService.reviewProductByOrder(
+				orderId,
+				id,
+				object
+			)
+			return response
+		} catch (error) {
+			const message =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString()
+			return thunkAPI.rejectWithValue(message)
+		}
+	}
+)
 //get reviewed products by user
 export const reviewedProduct = createAsyncThunk(
 	'reviewedProducts',

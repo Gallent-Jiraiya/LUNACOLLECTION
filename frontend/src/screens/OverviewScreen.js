@@ -3,7 +3,6 @@ import { Col, Row } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 import { Chart } from 'react-google-charts'
 
-import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
@@ -78,6 +77,7 @@ const OverviewScreen = () => {
 		hAxis: { title: 'Month' },
 		vAxis: { title: 'Sales Count' },
 		chartArea: { width: '80%', height: '70%' },
+		colors: ['#e0440e'],
 	}
 	const regOptions = {
 		title: 'User Registration Count for past 12 Month',
@@ -85,6 +85,7 @@ const OverviewScreen = () => {
 		hAxis: { title: 'Month' },
 		vAxis: { title: 'Register Count' },
 		chartArea: { width: '80%', height: '70%' },
+		colors: ['#e0440e'],
 	}
 	return (
 		<>
@@ -125,7 +126,7 @@ const OverviewScreen = () => {
 					<Card variant='outlined'>
 						<CardContent>
 							<Typography variant='h5' component='h2'>
-								Total Orders in last 12 months
+								Total Orders for a Year
 							</Typography>
 
 							<Typography variant='h4'>{overviewData.ordercount}</Typography>
